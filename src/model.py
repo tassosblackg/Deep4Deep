@@ -31,7 +31,7 @@ def bias_dict(shape):
 
 #return convolution result --optional add bias
 def conv2d(x,W,stride=1):
-    return(tf.nn.conv2d(x,W,strides=[1,stride,stride,1],padding='SAME'))
+    return(tf.nn.conv2d(x,W,strides=[1,stride,stride,1],padding='SAME')+bias_dict(shape))
 #define convolution layer
 def conv_layer(inp,shape):
     W=weight_dict(shape)
