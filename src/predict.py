@@ -1,11 +1,11 @@
 import os
 import tensorflow as tf
 from model import CNN
-from lib.model_io import get_modle_id
+from lib.model_io import get_model_id
 from lib.model_io import restore_variables
 
 
-model_id = get_modle_id()
+model_id = get_model_id()
 
 
 # Create the network

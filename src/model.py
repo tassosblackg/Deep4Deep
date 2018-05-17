@@ -4,6 +4,8 @@
 #we should try first the baseline CNN ?? is that implemented in the given matlab code??
 #So we only design our V.D.CNN
 
+#Bonus: ->batch normalization
+
 
 
 from __future__ import division, print_function
@@ -27,13 +29,13 @@ def bias_dict(shape):
     init=tf.constant(0.1,shape=shape)
     return(tf.Variable(init))
 
-#return convolution result
+#return convolution result --optional add bias
 def conv2d(x,W,stride=1):
     return(tf.nn.conv2d(x,W,strides=[1,stride,stride,1],padding='SAME'))
 #define convolution layer
 def conv_layer(inp,shape):
     W=weight_dict(shape)
-    #b=bias_dict()
+    #b=bias_dict(shape[3])
     return(tf.nn.relu(conv2d(inp,W)))
 #define max pooling function
 def max_pool(x,stride,k):
@@ -56,7 +58,12 @@ class CNN(object):
 
     def __init__(self, model_id=None):
         self.model_id = model_id
-
+        self.train_list=[]
+        self.valid_list=[]
+        self.batch_size=256 #64 || 128 || 256
+        self.train_size=1587420 #number of files
+        self.dev_size=1029721   #number of files in dev/
+        sef.eval_size=8522944
 
     def inference(self, X, reuse=True, is_training=True):
         with tf.variable_scope("inference", reuse=reuse):
@@ -71,7 +78,7 @@ class CNN(object):
             #b=bias_dict([shape1[3]])
             conv1=conv2d(X,w) #+b #init_convolution
 
-            #@---1st set--------{2 blocks}
+    #-----------1st set--------{2 blocks}---------------------------------------
             #-------1st block
             shape1=[3,3,4,64]
             conv_l1=conv_layer(conv1,shape1)
@@ -89,7 +96,7 @@ class CNN(object):
 
             mpool_2=max_pool(batch_norm4,1,1) #stride =1 , k=1
 
-            #@--2nd set------{3 blocks}
+    #--------2nd set------{3 blocks}--------------------------------------------
             #-------3d block
             shape3=[3,3,16,128]
             conv_l5=conv_layer(mpool_2,shape3)
@@ -115,7 +122,7 @@ class CNN(object):
 
             mpool_5=max_pool(batch_norm10,2,2) #stride=2, k=2
 
-            #add dense layers
+    #------------add dense layers {4 layers}-------------------------------------
 
         return Y
 
@@ -124,11 +131,12 @@ class CNN(object):
         # --- Train computations
         self.trainDataReader = trainDataReader
         #shaping variables--
-        batch_size=256 #64 || 128 || 256
+        #__________________________________________________
         height=64
         width=17
         chan=1 #channel of image 1 or 3 if rgb
         n_classes=2 # genuine or spoof --number of classes
+        #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
         X_data_train = tf.placeholder( tf.float32,shape=(None,height,width,chan) ) # Define this
 
@@ -166,9 +174,9 @@ class CNN(object):
     def train_epoch(self, sess):
         train_loss = 0
         total_batches = 0
-
-        while #loop through train batches:
-            mean_loss, _ = sess.run([self.train_loss, self.update_ops], feed_dict=......)
+        n_elemnt=self.train_size/self.batch_size#??
+        while (total_batches<=n_elemnt):#loop through train batches:
+            mean_loss, _ = sess.run([self.train_loss, self.update_ops], feed_dict={X_train: ,Y_train:})
             if math.isnan(mean_loss):
                 print('train cost is NaN')
                 break
@@ -184,9 +192,9 @@ class CNN(object):
     def valid_epoch(self, sess):
         valid_loss = 0
         total_batches = 0
-
-        while # Loop through valid batches:
-            mean_loss = sess.run(self.valid_loss, feed_dict=....)
+        n_elmnts=self.dev_size/self.batch_size #number of elements
+        while (total_batches<n_elmnts):# Loop through valid batches:
+            mean_loss = sess.run(self.valid_loss, feed_dict={X_val:,Y_val:})
             if math.isnan(mean_loss):
                 print('valid cost is NaN')
                 break

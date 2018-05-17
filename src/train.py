@@ -2,9 +2,9 @@ import os
 import numpy as np
 import tensorflow as tf
 from model import CNN
-from lib.model_io import get_modle_id
+from lib.model_io import get_model_id
 
-model_id = get_modle_id()
+model_id = get_model_id()
 
 
 
@@ -20,16 +20,7 @@ network.define_train_operations()
 sess = tf.Session()
 try:
     network.train(cfg, coord, sess)
-except KeyboardInterrupt:  
+except KeyboardInterrupt:
     print()
 finally:
-    sess.close() 
-
-
-
-
-
-
-
-
-
+    sess.close()
