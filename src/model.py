@@ -35,17 +35,17 @@ def conv2d(x,W,stride=1):
 #define convolution layer
 def conv_layer(inp,shape):
     W=weight_dict(shape)
-    #b=bias_dict(shape[3])
-    return(tf.nn.relu(conv2d(inp,W)))
+    b=bias_dict([shape[3]])
+    return(tf.nn.relu(conv2d(inp,W)+b))
 #define max pooling function
 def max_pool(x,stride,k):
     return (tf.nn.max_pool(x,strides=[1, 2, stride, 1], ksize=[1, 2, k, 1] , padding='VALID') )
 
 #define dense layers--last block of layers
-def debnse_layer(inp,size,loss):
-    in_s=int(inp.getshape()[1])
+def dense_layer(inp,size,loss):
+    in_s=int(inp.getshape()[1]) #flatten layer
     W=weight_dict([in_s,size])
-    #b=bias_dict()
+    b=bias_dict(shape)
     #loss+=
     return (tf.matmul(inp,W),loss)
 #batch normalization
