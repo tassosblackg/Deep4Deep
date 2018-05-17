@@ -31,21 +31,21 @@ def bias_dict(shape):
 
 #return convolution result --optional add bias
 def conv2d(x,W,stride=1):
-    return(tf.nn.conv2d(x,W,strides=[1,stride,stride,1],padding='SAME'))
+    return(tf.nn.conv2d(x,W,strides=[1,stride,stride,1],padding='SAME')+bias_dict(shape))
 #define convolution layer
 def conv_layer(inp,shape):
     W=weight_dict(shape)
-    #b=bias_dict(shape[3])
-    return(tf.nn.relu(conv2d(inp,W)))
+    b=bias_dict(shape[3])
+    return(tf.nn.relu(conv2d(inp,W)+bias_dict(shape))
 #define max pooling function
 def max_pool(x,stride,k):
     return (tf.nn.max_pool(x,strides=[1, 2, stride, 1], ksize=[1, 2, k, 1] , padding='VALID') )
 
 #define dense layers--last block of layers
-def debnse_layer(inp,size,loss):
+def dense_layer(inp,size,loss):
     in_s=int(inp.getshape()[1])
     W=weight_dict([in_s,size])
-    #b=bias_dict()
+    b=bias_dict(shape)
     #loss+=
     return (tf.matmul(inp,W),loss)
 #batch normalization
