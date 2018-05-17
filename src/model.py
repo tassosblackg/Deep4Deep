@@ -75,8 +75,8 @@ class CNN(object):
             #init phase
             shape1=[3,3,1,64]
             w=weight_dict(shape1)
-            #b=bias_dict([shape1[3]])
-            conv1=conv2d(X,w) #+b #init_convolution
+            b=bias_dict([shape1[3]])
+            conv1=conv2d(X,w) +b #init_convolution
 
     #-----------1st set--------{2 blocks}---------------------------------------
             #-------1st block
