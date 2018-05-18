@@ -5,6 +5,25 @@ import glob as g
 import numpy as np
 import matplotlib.pyplot as plt
 
+#read if .wav file is genuine or spoof --create label
+def read_label(filename):
+    types=[]
+    with open(filename,'rb') as f:
+        #read line by line
+        line=f.readline()
+        while line:
+            l_words=line.split(" ") #seperate words by space
+            if(l_words[1]=="genuine"):
+                types.append('1')
+            else if (l_words[1]=="spoof"):
+                types.append('0')
+            else:
+                pass
+            line=f.readline
+    return types
+
+
+
 #read files' name of directory and create an array of them
 def read_dir(dir_name):
     files=g.glob(dir_name+"/*.cmp")
@@ -21,10 +40,10 @@ def read_cmp_file(cmp_filename):
         cmp_data = np.fromfile(fid, dtype=np.float32, count=-1)
 
     cmp_data = cmp_data.reshape((-1, nfilt))  # where nfilt = 64
-    # check if read is done right
-    fbank = 10  # put a number between 0 and 63
-    plt.plot(cmp_data[:, fbank])
-    plt.show()
+    #@ check if read is done right
+    #fbank = 10  # put a number between 0 and 63
+    #plt.plot(cmp_data[: fbank])
+    #plt.show()
     return (cmp_data)
 
 
