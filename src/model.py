@@ -73,14 +73,14 @@ class CNN(object):
             #each set has more than one convolution and max_poolin layers
             # totaly we have 2 sets and 5 blocks
             #init phase
-            shape1=[3,3,1,64]
+            shape1=[3,3,1,4] #[filter_h,filter_w,in_channel,out_channel]
             w=weight_dict(shape1)
             b=bias_dict([shape1[3]])
             conv1=conv2d(X,w) +b #init_convolution
 
     #-----------1st set--------{2 blocks}---------------------------------------
             #-------1st block
-            shape1=[3,3,4,64]
+            shape1=[3,3,1,8]
             conv_l1=conv_layer(conv1,shape1)
             batch_norm1=batch_n(conv_l1) #normalization
             conv_l2=conv_layer(batch_norm1,shape1)
@@ -88,7 +88,7 @@ class CNN(object):
 
             mpool_1=max_pool(batch_norm2,1,1) #stride =1 , k=1
             #------2nd block
-            shape2=[3,3,8,128]
+            shape2=[3,3,1,8]
             conv_l3=conv_layer(mpool_1,shape2)
             batch_norm3=batch_n(conv_l3) #normalization
             conv_l4=conv_layer(batch_norm3,shape2)
@@ -98,7 +98,7 @@ class CNN(object):
 
     #--------2nd set------{3 blocks}--------------------------------------------
             #-------3d block
-            shape3=[3,3,16,128]
+            shape3=[3,3,1,16]
             conv_l5=conv_layer(mpool_2,shape3)
             batch_norm5=batch_n(conv_l5) #normalization
             conv_l6=conv_layer(batch_norm1,shape3)
@@ -106,7 +106,7 @@ class CNN(object):
 
             mpool_3=max_pool(batch_norm6,1,1) #stride =1 , k=1
             #--------4th block
-            shape4=[3,3,32,256]
+            shape4=[3,3,1,32]
             conv_l7=conv_layer(mpool_3,shape4)
             batch_norm7=batch_n(conv_l7)
             conv_l8=conv_layer(batch_norm7,shape4)
@@ -114,7 +114,7 @@ class CNN(object):
 
             mpool_4=max_pool(batch_norm8,2,2) #stride=2, k=2
             #--------5th blocks
-            shape5=[3,3,64,256]
+            shape5=[3,3,1,64]
             conv_l9=conv_layer(mpool_4,shape5)
             batch_norm9=batch_n(conv_l9)
             conv_l10=conv_layer(batch_norm9,shape5)
