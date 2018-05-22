@@ -5,53 +5,52 @@ import glob as g
 import numpy as np
 import matplotlib.pyplot as plt
 
-#read if .wav file is genuine or spoof --create label
+# read if .wav file is genuine or spoof --create label
+# as filename put the full path of train_info file in protocolv2 dir
+
+
 def read_label(filename):
-    types=[]
-    with open(filename,'rb') as f:
-        #read line by line
-        line=f.readline()
-        while line:
-            l_words=line.split(" ") #seperate words by space
-            if(l_words[1]=="genuine"):
+    types = []
+    with open(filename, 'r') as f:
+        # read line by line
+        for line in f:
+            l_words = line.split(" ")  # seperate words by space
+            if(l_words[1] == "genuine"):
                 types.append('1')
-            else if (l_words[1]=="spoof"):
+            elif (l_words[1] == "spoof"):
                 types.append('0')
             else:
                 pass
-            line=f.readline
+
     return types
 
 
-
-#read files' name of directory and create an array of them
+# read files' name of directory and create an array of them
 def read_dir(dir_name):
-    files=g.glob(dir_name+"/*.cmp")
-    cmp_list=[]
+    files = g.glob(dir_name+"/*.cmp")
+    cmp_list = []
     for i in range(files.__len__()):
         cmp_list.append(read_cmp_file(files[i]))
     return cmp_list
 
 
-#read .cmp files and converted to numpy array (transposed)
+# read .cmp files and converted to numpy array (transposed)
 def read_cmp_file(cmp_filename):
-    nfilt=64
+    nfilt = 64
     with open(cmp_filename, 'rb') as fid:
         cmp_data = np.fromfile(fid, dtype=np.float32, count=-1)
 
     cmp_data = cmp_data.reshape((-1, nfilt))  # where nfilt = 64
-    #@ check if read is done right
-    #fbank = 10  # put a number between 0 and 63
+    # @ check if read is done right
+    # fbank = 10  # put a number between 0 and 63
     #plt.plot(cmp_data[: fbank])
-    #plt.show()
+    # plt.show()
     return (cmp_data)
-
-
 
 
 # ------------------------------------------------------------------------------
 # convert .cmp file to image
-#what is params ?? cmp_data
+# what is params ?? cmp_data
 
 def convert_to_images(self, params):
     context_width = 17
