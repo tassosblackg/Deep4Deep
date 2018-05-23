@@ -17,7 +17,7 @@ import tensorflow as tf
 import numpy as np
 from lib.model_io import save_variables
 from lib.precision import _FLOATX
-
+import read_img as rim
 # ------define architecture functions--------------------------------------------------------------
 # define weights
 
@@ -36,14 +36,14 @@ def bias_dict(shape):
 
 
 def conv2d(x, W, stride=1):
-    return(tf.nn.conv2d(x, W, strides=[1, stride, stride, 1], padding='SAME')+bias_dict(shape))
+    return(tf.nn.conv2d(x, W, strides=[1, stride, stride, 1], padding='SAME') + bias_dict(shape))
 # define convolution layer
 
 
 def conv_layer(inp, shape):
     W = weight_dict(shape)
     b = bias_dict([shape[3]])
-    return(tf.nn.relu(conv2d(inp, W)+b))
+    return(tf.nn.relu(conv2d(inp, W) + b))
 # define max pooling function
 
 
@@ -140,6 +140,11 @@ class CNN(object):
         return Y
 
     def define_train_operations(self):
+        # read data?
+        self.train_list = rim.read_Data(
+            "../../ASV/DATA/ASVspoof2017_V2_train_fbank", "train_info.txt")  # define this properly
+        self.valid_list = rim.read_Data(
+            "../../ASV/DATA/ASVspoof2017_V2_train_dev", "dev_info.txt")
 
         # --- Train computations
         self.trainDataReader = trainDataReader
@@ -192,7 +197,7 @@ class CNN(object):
     def train_epoch(self, sess):
         train_loss = 0
         total_batches = 0
-        n_elemnt = self.train_size/self.batch_size  # ??
+        n_elemnt = self.train_size / self.batch_size  # ??
         while (total_batches <= n_elemnt):  # loop through train batches:
             mean_loss, _ = sess.run([self.train_loss, self.update_ops], feed_dict={X_train: , Y_train: })
             if math.isnan(mean_loss):
@@ -209,7 +214,7 @@ class CNN(object):
     def valid_epoch(self, sess):
         valid_loss = 0
         total_batches = 0
-        n_elmnts = self.dev_size/self.batch_size  # number of elements
+        n_elmnts = self.dev_size / self.batch_size  # number of elements
         while (total_batches < n_elmnts):  # Loop through valid batches:
             mean_loss = sess.run(self.valid_loss, feed_dict={X_val:, Y_val: })
             if math.isnan(mean_loss):
