@@ -6,18 +6,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-path="../protocol_V2"
+path="../protocol_V2" # check and define it properly
+
 # read if .wav file is genuine or spoof --create label
 # as filename put the full path of train_info file in protocolv2 dir
 def read_label(filename):
     full_path=os.path.join(path,filename)
-    files_n = [] #save .wav file's name
+    #files_n = [] #save .wav file's name
     class_type = [] #save labels
     with open(full_path, 'r') as f:
         # read line by line
         for line in f:
             l_words = line.split(" ")  # seperate words by space
-            files_n.append(l_words[0])
+            #files_n.append(l_words[0])
             if(l_words[1] == "genuine"):
                 class_type.append('1')
             elif (l_words[1] == "spoof"):
@@ -25,10 +26,10 @@ def read_label(filename):
             else:
                 pass
 
-    return files_n,class_type
+    return class_type
 
 
-# read  files' name of directory and create an array of them
+# read  all files' name from directory and create an array of them
 def read_dir(dir_name):
     files = g.glob(dir_name+"/*.cmp")
     cmp_list = []
@@ -49,23 +50,29 @@ def read_cmp_file(cmp_filename):
     #plt.plot(cmp_data[: fbank])
     # plt.show()
     return (cmp_data)
-#read all cmp files of a directory
-def read_all_cmp(dir_name):
-    cmp_nl=read_dir(dir_name)
+
+#read all input image files of a directory
+#and labels from each files
+#args:
+# @dir_name : directory name where .cmp files are saved
+# @info_fl : text file where info about train,eval,dev sets are saved
+def read_Data(dir_name,info_fl):
+    cmp_nl=read_dir(dir_name) #read .cmp files from dir
+    cl_types=read_label(info_fl) # read label from info file
     data_l=[]
+    #for each cmp file
     for i in range (cmp_nl.__len__()):
-        cmp_data=read_cmp_file(cmp_nl[i])
-        cmp2img=convert_to_images(cmp_data)
-        data_l.append(cmp2img)
+        cmp_data=read_cmp_file(cmp_nl[i]) #read that file
+        cmp2img=convert_to_images(cmp_data) #convert this file to image
+        data_l.append(cmp2img,cl_types[i]) # image object appent to a list
     return data_l
 
 # ------------------------------------------------------------------------------
 # convert .cmp file to image
 # what is params ?? cmp_data
-
+#converts cmp files to image and take transpose of img array
 def convert_to_images(params):
     context_width = 17
-    context_width = context_width
     n_frames, param_dim = params.shape
     border = context_width // 2
 
