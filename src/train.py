@@ -19,7 +19,7 @@ network.define_train_operations()
 # Train the network
 sess = tf.Session()
 try:
-    network.train(cfg, coord, sess)
+    network.train(sess)
 except KeyboardInterrupt:
     print()
 finally:

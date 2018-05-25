@@ -15,7 +15,7 @@ network.define_predict_operations()
 # Recover the parameters of the model
 sess = tf.Session()
 
-restore_variables(sess, cfg)
+restore_variables(sess)
 
 
 
