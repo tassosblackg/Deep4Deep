@@ -10,7 +10,7 @@ model_id = get_model_id()
 
 
 # Create the network
-network = CNN(cfg, model_id)
+network = CNN(model_id)
 
 
 # Define the train computation graph
