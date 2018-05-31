@@ -63,11 +63,12 @@ def read_Data(dir_name, info_fl):
     data_l = []
     types=[]
     total_nframes=0;
+    dim=64
     # for each cmp file
     for i in range(cmp_nl.__len__()):
         cmp_data = read_cmp_file(cmp_nl[i])  # read that file
         cmp2img = convert_to_images(cmp_data)  # convert this file to image --returns a np array
-        nframes,dim=cmp2img.shape #size of np array
+        nframes=cmp2img.shape[0] #size of np array
         types.append([cl_types[i]*nframes]) #instead to keep one label per cmp, keep for each frame of it
         total_nframes+=nframes #all images
         data_l.append(cmp2img) #keep all imgs -- a list with numpy array
@@ -77,7 +78,7 @@ def read_Data(dir_name, info_fl):
     indx=0
     #iterate through list objects(numpy elements)
     for l in range(data_l.__len__()):
-        cframes=l.shape
+        cframes=data_l[l].shape[0]
         all_imgs[indx:indx+nframes,:]=data_l[l]
         all_labels[indx:indx+nframes,:]=types[l]
         indx=indx+cframes
@@ -86,7 +87,7 @@ def read_Data(dir_name, info_fl):
 
 
 
-    return all_data,nframes
+    return all_data,total_nframes
 
 # ------------------------------------------------------------------------------
 # convert .cmp file to image
