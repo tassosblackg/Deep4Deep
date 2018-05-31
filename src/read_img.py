@@ -10,8 +10,6 @@ path = "../protocol_V2"  # check and define it properly
 
 # read if .wav file is genuine or spoof --create label
 # as filename put the full path of train_info file in protocolv2 dir
-
-
 def read_label(filename):
     full_path = os.path.join(path, filename)
     # files_n = [] #save .wav file's name
@@ -44,32 +42,51 @@ def read_dir(dir_name):
 def read_cmp_file(cmp_filename):
     nfilt = 64
     with open(cmp_filename, 'rb') as fid:
-        cmp_data = np.fromfile(fid, dtype=np.float32, count=-1)
+        cmp_data1 = np.fromfile(fid, dtype=np.float32, count=-1)
 
-    cmp_data = cmp_data.reshape((-1, nfilt))  # where nfilt = 64
+    cmp_data = cmp_data1.reshape((-1, nfilt))  # where nfilt = 64
     # @ check if read is done right
-    # fbank = 10  # put a number between 0 and 63
-    #plt.plot(cmp_data[: fbank])
-    # plt.show()
+    fbank = 30  # put a number between 0 and 63
+    plt.plot(cmp_data[:, fbank])
+    plt.show()
     return (cmp_data)
+
 
 # read all input image files of a directory
 # and labels from each files
 # args:
 # @dir_name : directory name where .cmp files are saved
 # @info_fl : text file where info about train,eval,dev sets are saved
-
-
 def read_Data(dir_name, info_fl):
     cmp_nl = read_dir(dir_name)  # read .cmp files from dir
     cl_types = read_label(info_fl)  # read label from info file
     data_l = []
+    types=[]
+    total_nframes=0;
     # for each cmp file
     for i in range(cmp_nl.__len__()):
         cmp_data = read_cmp_file(cmp_nl[i])  # read that file
-        cmp2img = convert_to_images(cmp_data)  # convert this file to image
-        data_l.append(cmp2img, cl_types[i])  # image object appent to a list
-    return data_l
+        cmp2img = convert_to_images(cmp_data)  # convert this file to image --returns a np array
+        nframes,dim=cmp2img.shape #size of np array
+        types.append([cl_types[i]*nframes]) #instead to keep one label per cmp, keep for each frame of it
+        total_nframes+=nframes #all images
+        data_l.append(cmp2img) #keep all imgs -- a list with numpy array
+    #create all_params np array
+    all_imgs=np.zeros(shape=(total_nframes,dim),dtype=np.float32) #initialize np array
+    all_labels=np.zeros(shape=(total_nframes,1),dtype=np.int32) #repeat labels type for each frame
+    indx=0
+    #iterate through list objects(numpy elements)
+    for l in range(data_l.__len__()):
+        cframes=l.shape
+        all_params[indx:indx+nframes,:]=data_l[l]
+        all_labels[indx:indx+nframes,:]=types[l]
+        indx=indx+cframes
+    #concatenate imgs with labels
+    all_data=np.concatenate((all_imgs,all_labels),axis=0)
+
+
+
+    return all_data,nframes
 
 # ------------------------------------------------------------------------------
 # convert .cmp file to image
