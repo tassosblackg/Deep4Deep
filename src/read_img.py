@@ -78,7 +78,7 @@ def read_Data(dir_name, info_fl):
     #iterate through list objects(numpy elements)
     for l in range(data_l.__len__()):
         cframes=l.shape
-        all_params[indx:indx+nframes,:]=data_l[l]
+        all_imgs[indx:indx+nframes,:]=data_l[l]
         all_labels[indx:indx+nframes,:]=types[l]
         indx=indx+cframes
     #concatenate imgs with labels
