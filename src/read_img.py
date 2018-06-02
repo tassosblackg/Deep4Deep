@@ -5,9 +5,11 @@ import glob as g
 import numpy as np
 import matplotlib.pyplot as plt
 
+#very IMPORTANT to define the right params_with_borders
+#check your project directories
 
-path = "../protocol_V2"  # check and define it properly
-
+path = "../../protocol_V2"  # check and define it properly
+dir_n="/home/tassos/Desktop/ASV/DATA" #check and define where is your DATA dir
 # read if .wav file is genuine or spoof --create label
 # as filename put the full path of train_info file in protocolv2 dir
 def read_label(filename):
@@ -30,11 +32,13 @@ def read_label(filename):
 
 
 # read  all files' name from directory and create an array of them
-def read_dir(dir_name):
-    files = g.glob(dir_name + "/*.cmp")
+def read_dir(folder_name):
+    files = g.glob(dir_n+"/"+folder_name + "/*.cmp")
+    #print(files)
     cmp_list = []
     for i in range(files.__len__()):
         cmp_list.append(read_cmp_file(files[i]))
+    #print(cmp_list.__len__())
     return cmp_list
 
 
