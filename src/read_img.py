@@ -62,36 +62,51 @@ def read_cmp_file(cmp_filename):
 # @dir_name : directory name where .cmp files are saved
 # @info_fl : text file where info about train,eval,dev sets are saved
 def read_Data(dir_name, info_fl):
-    cmp_nl = read_cmp_dir(dir_name)  # read .cmp files from dir
-    print("\ncmp_nl data have been read...\n")
+    cmp_data = read_cmp_dir(dir_name)  # read .cmp files from dir
+    #print("\ncmp_nl data have been read...\n")
     cl_types = read_label(info_fl)  # read label from info file
-    print("\ncl_types have been read...\n")
+    #print("\ncl_types have been read...\n")
     data_l = []
     types=[]
     total_nframes=0;
-    dim=64
-    print("enter loop 1..\n")
+    #print("enter loop 1..\n")
     # for each cmp file
-    for i in range(cmp_nl.__len__()):
+    for i in range(cmp_data.__len__()):
         # cmp_data = read_cmp_file(cmp_nl[i])  # read that file
-        cmp2img = convert_to_images(cmp_data)  # convert this file to image --returns a np array
+        cmp2img = convert_to_images(cmp_data[i])  # convert this file to image --returns a np array
         nframes=cmp2img.shape[0] #size of np array
+        #print(cmp2img.shape) #(num of images,heigt,width,1)
         types.append([cl_types[i]*nframes]) #instead to keep one label per cmp, keep for each frame of it
         total_nframes+=nframes #all images
         data_l.append(cmp2img) #keep all imgs -- a list with numpy array
-    print("end of loop1..\n")
+    #print("end of loop1..\n")
+    dim=cmp2img.shape[1]
+    width=cmp2img.shape[2]
+    #print(dim,width)
+    ##free some space
+    del(cl_types[:])
+    del(cl_types)
+    del(cmp_data[:])
+    del(cmp_data)
     #create all_params np array
-    all_imgs=np.zeros(shape=(total_nframes,dim),dtype=np.float32) #initialize np array
-    all_labels=np.zeros(shape=(total_nframes,1),dtype=np.int32) #repeat labels type for each frame
+    all_imgs=np.zeros(shape=(total_nframes,dim,width,1),dtype=np.float32) #initialize np array
+    all_labels=np.zeros(shape=(total_nframes,1),dtype=np.float32) #repeat labels type for each frame
     indx=0
     print("in loop2..\n")
+    print(total_nframes)
     #iterate through list objects(numpy elements)
     for l in range(data_l.__len__()):
         cframes=data_l[l].shape[0]
-        all_imgs[indx:indx+nframes,:]=data_l[l]
-        all_labels[indx:indx+nframes,:]=types[l]
+        #print(cframes)
+        all_imgs[indx:indx+cframes,:]=data_l[l]
+        del(data_l[l]) #free some space
+        all_labels[indx:indx+cframes,:]=types[l]
+        del(types[l]) #free space
         indx=indx+cframes
-    print("end loop2..\n")
+    #print("end loop2..\n")
+    #free space
+    del(data_l)
+    del(types)
     #concatenate imgs with labels
     all_data=np.concatenate((all_imgs,all_labels),axis=0)
     print("Data have been read...!\n")
