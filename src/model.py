@@ -53,24 +53,40 @@ def max_pool(x, stride, k):
 # define dense layers--last block of layers
 
 
-def dense_layer(inp, size, loss):
-    # # Dense Layer
-    # flat = tf.reshape(inp, [-1, 7 * 7 * 64])
-    # dense = tf.layers.dense(inputs=flat, units=1024, activation=tf.nn.relu)
-    # dropout = tf.layers.dropout(inputs=dense, rate=0.2, training=mode == tf.estimator.ModeKeys.TRAIN)
-    #
-    # # Logits Layer
-    # logits = tf.layers.dense(inputs=dropout, units=2,activation=tf.nn.softmax)
 
-    #tf.nn.softmax(logits,axis=-1,name="GenOrSpoof",dim=2)
-
+# def full_layer(input, size,l2_loss):
+#     in_size=int(input.get_shape()[1])
+#     W=weight_variable([in_size,size])
+#     b=bias_variable([size])
+#     l2_loss += tf.nn.l2_loss(W)+tf.nn.l2_loss(b)
+#     return tf.matmul(input,W)+b,l2_loss
+#
+#  # flat = tf.reshape(inp, [-1, 7 * 7 * 64])
+#
+#  #Fully-Connected Layer 1
+#         full_1,l2_loss=full_layer(reshaped,2048,l2_loss)
+#         full_1=tf.nn.relu(full_1)
+#         full_drop_1=tf.nn.dropout(full_1,keep_prob=self.dropout_keep_prob)    #Perform dropout on fully connected layer
+#
+#--------------------------------------------------------------------------------------------
     # in_s = int(inp.getshape()[1])  # flatten layer
     # W = weight_dict([in_s, size])
     # b = bias_dict(shape)
     # # loss+=
     # return (tf.matmul(inp, W), loss)
     # return (tf.nn.softmax(tf.matmul(in_s,W)))
-    # return logits
+#--------------------------------------------------------------------------------------------
+
+
+def dense_layer(inp, size):
+
+    dense = tf.layers.dense(inputs=inp, units=size, activation=tf.nn.relu)
+    dropout = tf.layers.dropout(inputs=dense, rate=0.2, training = tf.estimator.ModeKeys.TRAIN)
+
+
+    #tf.nn.softmax(logits,axis=-1,name="GenOrSpoof",dim=2)
+
+    return dropout
 
 # batch normalization
 def batch_n(convl):
@@ -92,7 +108,8 @@ class CNN(object):
         self.batch_size = 256  # 64 || 128 || 256
         self.train_size = 1587420  # number of files
         self.dev_size = 1029721  # number of files in dev/
-        sef.eval_size = 8522944
+        self.eval_size = 8522944
+
 
     def inference(self, X, reuse=True, is_training=True):
         with tf.variable_scope("inference", reuse=reuse):
@@ -152,8 +169,20 @@ class CNN(object):
             mpool_5 = max_pool(batch_norm10, 2, 2)  # stride=2, k=2
 
     # ------------add dense layers {4 layers}-------------------------------------
-            dense_layer(mpool_5,size,loss)
-        return Y
+
+            flat = tf.reshape(mpool_5, [-1, 7 * 7 * 64])
+            loss = tf.constant(0.0)
+            size=1024
+            #---------------dense layer 1-------------------------
+            dense1 = dense_layer(flat,size)
+            # ---------------dense layer 2-------------------------
+            dense2 = dense_layer(dense1, size)
+
+            logits = tf.layers.dense(inputs=dense2, units=2, activation=tf.nn.softmax)
+            # tf.nn.softmax(logits,axis=-1,name="GenOrSpoof",dim=2)
+
+
+        return logits
 
     def define_train_operations(self):
         # read data?
@@ -163,7 +192,7 @@ class CNN(object):
             "../../ASV/DATA/ASVspoof2017_V2_train_dev", "dev_info.txt")
 
         # --- Train computations
-        self.trainDataReader = trainDataReader
+        #self.trainDataReader = trainDataReader
         # shaping variables--
 
         # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -183,7 +212,7 @@ class CNN(object):
 
         # define learning rate decay method
         global_step = tf.Variable(0, trainable=False, name='global_step')
-        learning_rate = 0.001  # Define it--play with this
+        learning_rate = 0.001                                                        # Define it--play with this
 
         # define the optimization algorithm
         # Define it --shall we try different type of optimizers
@@ -218,7 +247,7 @@ class CNN(object):
             train_loss += mean_loss
             total_batches += 1
 
-        if total_samples > 0:
+        if total_batches > 0:
             train_loss /= total_batches
 
         return train_loss
@@ -235,7 +264,7 @@ class CNN(object):
             valid_loss += mean_loss
             total_batches += 1
 
-        if total_samples > 0:
+        if total_batches > 0:
             valid_loss /= total_batches
 
         return valid_loss
