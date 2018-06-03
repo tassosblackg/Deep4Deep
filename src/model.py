@@ -36,7 +36,7 @@ def bias_dict(shape):
 
 
 def conv2d(x, W, stride=1):
-    return(tf.nn.conv2d(x, W, strides=[1, stride, stride, 1], padding='SAME') + bias_dict(shape))
+    return(tf.nn.conv2d(x, W, strides=[1, stride, stride, 1], padding='SAME') )
 # define convolution layer
 
 
@@ -54,14 +54,25 @@ def max_pool(x, stride, k):
 
 
 def dense_layer(inp, size, loss):
-    in_s = int(inp.getshape()[1])  # flatten layer
-    W = weight_dict([in_s, size])
-    b = bias_dict(shape)
-    # loss+=
-    return (tf.matmul(inp, W), loss)
+    # # Dense Layer
+    # flat = tf.reshape(inp, [-1, 7 * 7 * 64])
+    # dense = tf.layers.dense(inputs=flat, units=1024, activation=tf.nn.relu)
+    # dropout = tf.layers.dropout(inputs=dense, rate=0.2, training=mode == tf.estimator.ModeKeys.TRAIN)
+    #
+    # # Logits Layer
+    # logits = tf.layers.dense(inputs=dropout, units=2,activation=tf.nn.softmax)
+
+    #tf.nn.softmax(logits,axis=-1,name="GenOrSpoof",dim=2)
+
+    # in_s = int(inp.getshape()[1])  # flatten layer
+    # W = weight_dict([in_s, size])
+    # b = bias_dict(shape)
+    # # loss+=
+    # return (tf.matmul(inp, W), loss)
+    # return (tf.nn.softmax(tf.matmul(in_s,W)))
+    # return logits
+
 # batch normalization
-
-
 def batch_n(convl):
     return (tf.nn.relu(tf.contrib.layers.batch_norm(convl)))
 # -------------------------------------------------------------------------------------------------------
@@ -73,6 +84,11 @@ class CNN(object):
         self.model_id = model_id
         self.train_list = []
         self.valid_list = []
+        # __________________________________________________
+        self.height = 64
+        self.width = 17
+        self.chan = 1  # channel of image 1 or 3 if rgb
+        self.n_classes = 2  # genuine or spoof --number of classes
         self.batch_size = 256  # 64 || 128 || 256
         self.train_size = 1587420  # number of files
         self.dev_size = 1029721  # number of files in dev/
@@ -136,7 +152,7 @@ class CNN(object):
             mpool_5 = max_pool(batch_norm10, 2, 2)  # stride=2, k=2
 
     # ------------add dense layers {4 layers}-------------------------------------
-
+            dense_layer(mpool_5,size,loss)
         return Y
 
     def define_train_operations(self):
@@ -149,18 +165,14 @@ class CNN(object):
         # --- Train computations
         self.trainDataReader = trainDataReader
         # shaping variables--
-        # __________________________________________________
-        height = 64
-        width = 17
-        chan = 1  # channel of image 1 or 3 if rgb
-        n_classes = 2  # genuine or spoof --number of classes
+
         # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
         X_data_train = tf.placeholder(tf.float32, shape=(
-            None, height, width, chan))  # Define this
+            None, self.height, self.width, self.chan))  # Define this
 
         Y_data_train = tf.placeholder(
-            tf.int32, shape=(None, n_classes))  # Define this
+            tf.int32, shape=(None, self.n_classes))  # Define this
 
         Y_net_train = self.inference(
             X_data_train, reuse=False)  # Network prediction
@@ -171,7 +183,7 @@ class CNN(object):
 
         # define learning rate decay method
         global_step = tf.Variable(0, trainable=False, name='global_step')
-        learning_rate = 0.01  # Define it--play with this
+        learning_rate = 0.001  # Define it--play with this
 
         # define the optimization algorithm
         # Define it --shall we try different type of optimizers
@@ -183,9 +195,9 @@ class CNN(object):
 
         # --- Validation computations
         X_data_valid = tf.placeholder(tf.float32, shape=(
-            None, height, width, chan))  # Define this
+            None, self.height, self.width, self.chan))  # Define this
         Y_data_valid = tf.placeholder(
-            tf.int32, shape=(None, n_classes))  # Define this
+            tf.int32, shape=(None, self.n_classes))  # Define this
 
         Y_net_valid = self.inference(
             X_data_valid, reuse=True)  # Network prediction
@@ -199,7 +211,7 @@ class CNN(object):
         total_batches = 0
         n_elemnt = self.train_size / self.batch_size  # ??
         while (total_batches <= n_elemnt):  # loop through train batches:
-            mean_loss, _ = sess.run([self.train_loss, self.update_ops], feed_dict={X_train: , Y_train: })
+            mean_loss, _ = sess.run([self.train_loss, self.update_ops], feed_dict={X_train: X_data_train , Y_train: Y_data_train })
             if math.isnan(mean_loss):
                 print('train cost is NaN')
                 break
@@ -216,7 +228,7 @@ class CNN(object):
         total_batches = 0
         n_elmnts = self.dev_size / self.batch_size  # number of elements
         while (total_batches < n_elmnts):  # Loop through valid batches:
-            mean_loss = sess.run(self.valid_loss, feed_dict={X_val:, Y_val: })
+            mean_loss = sess.run(self.valid_loss, feed_dict={X_val: X_data_valid, Y_val: Y_data_valid })
             if math.isnan(mean_loss):
                 print('valid cost is NaN')
                 break
@@ -232,7 +244,7 @@ class CNN(object):
         start_time = time.clock()
 
         n_early_stop_epochs =  # Define it
-        n_epochs = 50  # Define it
+        n_epochs = 100  # Define it
 
         saver = tf.train.Saver(
             var_list=tf.trainable_variables(), max_to_keep=4)
@@ -277,10 +289,11 @@ class CNN(object):
         print('Total time = ' + str(end_time - start_time))
 
     def define_predict_operations(self):
-        self.X_data_test_placeholder = tf.placeholder(....)
+        self.X_data_test_placeholder = tf.placeholder(tf.float32,shape=(None,self.height,self.width,self.chan)) #??
 
         self.Y_net_test = self.inference(
             self.X_data_test_placeholder, reuse=False)
 
     def predict_utterance(self, sess, testDataReader, dataWriter):
         # Define it
+        pred=self.inference()
