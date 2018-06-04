@@ -97,24 +97,36 @@ class CNN(object):
 
     def __init__(self, model_id=None):
         self.model_id = model_id
-        self.train_list = []
-        self.valid_list = []
+        self.Xtrain_in =np.empty(0)
+        self.Ytrain_in =np.empty(0)
+        self.Xvalid_in =np.empty(0)
+        self.Yvalid_in =np.empty(0)
+
         # __________________________________________________
         self.height = 64
         self.width = 17
-        self.chan = 1  # channel of image 1 or 3 if rgb
-        self.n_classes = 2  # genuine or spoof --number of classes
-        self.batch_size = 256  # 64 || 128 || 256
+        self.chan = 1           # channel of image 1 or 3 if rgb
+        self.n_classes = 2      # genuine or spoof --number of classes
+        self.batch_size = 256   # 64 || 128 || 256
 
-        self.train_size = 1587420  # number of files
-        self.dev_size = 1029721  # number of files in dev/
-        self.eval_size = 8522944
+        self.train_size =   0   #1587420  # number of frames (train)
+        self.dev_size = 0       #1029721  # number of frames (valid)
+        self.eval_size = 0      #8522944 #number of frames (eval)
+
 
     #normalize input data
     def normalize(self,X):
         col_max=np.max(X,axis=0)
         col_min=np.min(X,axis=0)
         normX=np.divide(X-col_min,col_max-col_min)
+
+    #read input data
+    def input(self):
+        self.Xtrain_in,self.Ytrain_in,self.train_size=rim.read_Data("ASVspoof2017_V2_train_fbank","train_info.txt") #Read Train data
+        self.Xtrain_in=self.normalize(self.Xtrain_in)   #Normalize input train set data
+
+        self.Xvalid_in,self.Yvalid_in,self.dev_size=rim.read_Data("ASVspoof2017_V2_train_dev","dev_info.txt") #Read validation data
+        self.Xvalid=self.normalize(self.Xvalid)         #Normalize input validation set data
 
     def inference(self, X, reuse=True, is_training=True):
         with tf.variable_scope("inference", reuse=reuse):
@@ -124,10 +136,10 @@ class CNN(object):
             # each set has more than one convolution and max_poolin layers
             # totaly we have 2 sets and 5 blocks
             # init phase
-            shape1 = [3, 3, 1, 4]  # [filter_h,filter_w,in_channel,out_channel]
+            shape1 = [3, 3, 1, 4]       # [filter_h,filter_w,in_channel,out_channel]
             w = weight_dict(shape1)
-            b = bias_dict([shape1[3]]) #out_channel== n_hidden
-            conv1 = conv2d(X, w) + b  # init_convolution
+            b = bias_dict([shape1[3]])  #out_channel== n_hidden
+            conv1 = conv2d(X, w) + b    # init_convolution
 
     # -----------1st set--------{2 blocks}---------------------------------------
             # -------1st block
@@ -137,7 +149,7 @@ class CNN(object):
             conv_l2 = conv_layer(batch_norm1, shape1)
             batch_norm2 = batch_n(conv_l2)           # batch normalization
 
-            mpool_1 = max_pool(batch_norm2, 1, 1)  # stride =1 , k=1
+            mpool_1 = max_pool(batch_norm2, 1, 1)   # stride =1 , k=1
             # ------2nd block
             shape2 = [3, 3, 1, 8]
             conv_l3 = conv_layer(mpool_1, shape2)
@@ -145,17 +157,17 @@ class CNN(object):
             conv_l4 = conv_layer(batch_norm3, shape2)
             batch_norm4 = batch_n(conv_l4)          #batch normalization
 
-            mpool_2 = max_pool(batch_norm4, 1, 1)  # stride =1 , k=1
+            mpool_2 = max_pool(batch_norm4, 1, 1)   # stride =1 , k=1
 
     # --------2nd set------{3 blocks}--------------------------------------------
             # -------3d block
             shape3 = [3, 3, 1, 16]
             conv_l5 = conv_layer(mpool_2, shape3)
-            batch_norm5 = batch_n(conv_l5)  # normalization
+            batch_norm5 = batch_n(conv_l5)      # normalization
             conv_l6 = conv_layer(batch_norm1, shape3)
-            batch_norm6 = batch_n(conv_l6)  # normalization batch
+            batch_norm6 = batch_n(conv_l6)      # normalization batch
 
-            mpool_3 = max_pool(batch_norm6, 1, 1)  # stride =1 , k=1
+            mpool_3 = max_pool(batch_norm6, 1, 1)   # stride =1 , k=1
             # --------4th block
             shape4 = [3, 3, 1, 32]
             conv_l7 = conv_layer(mpool_3, shape4)
@@ -163,7 +175,7 @@ class CNN(object):
             conv_l8 = conv_layer(batch_norm7, shape4)
             batch_norm8 = batch_n(conv_l8)
 
-            mpool_4 = max_pool(batch_norm8, 2, 2)  # stride=2, k=2
+            mpool_4 = max_pool(batch_norm8, 2, 2)   # stride=2, k=2
             # --------5th blocks
             shape5 = [3, 3, 1, 64]
             conv_l9 = conv_layer(mpool_4, shape5)
@@ -171,7 +183,7 @@ class CNN(object):
             conv_l10 = conv_layer(batch_norm9, shape5)
             batch_norm10 = batch_n(conv_l10)
 
-            mpool_5 = max_pool(batch_norm10, 2, 2)  # stride=2, k=2
+            mpool_5 = max_pool(batch_norm10, 2, 2)      # stride=2, k=2
 
     # ------------add dense layers {4 layers}-------------------------------------
 
@@ -190,11 +202,11 @@ class CNN(object):
         return logits
 
     def define_train_operations(self):
-        # read data?
-        self.train_list = rim.read_Data(
-            "../../ASV/DATA/ASVspoof2017_V2_train_fbank", "train_info.txt")  # define this properly
-        self.valid_list = rim.read_Data(
-            "../../ASV/DATA/ASVspoof2017_V2_train_dev", "dev_info.txt")
+        # # read data?
+        # self.train_list = rim.read_Data(
+        #     "../../ASV/DATA/ASVspoof2017_V2_train_fbank", "train_info.txt")  # define this properly
+        # self.valid_list = rim.read_Data(
+        #     "../../ASV/DATA/ASVspoof2017_V2_train_dev", "dev_info.txt")
 
         # --- Train computations
         #self.trainDataReader = trainDataReader
@@ -232,8 +244,9 @@ class CNN(object):
         Y_data_valid = tf.placeholder(
             tf.int32, shape=(None, self.n_classes))  # Define this
 
+        # Network prediction
         Y_net_valid = self.inference(
-            X_data_valid, reuse=True)  # Network prediction
+            X_data_valid, reuse=True)
 
         # Loss of validation data
         self.valid_loss = tf.reduce_mean(tf.nn.sparce_softmax_cross_entropy_with_logits(
@@ -260,7 +273,7 @@ class CNN(object):
         valid_loss = 0
         total_batches = 0
         n_elmnts = self.dev_size / self.batch_size  # number of elements
-        while (total_batches < n_elmnts):  # Loop through valid batches:
+        while (total_batches < n_elmnts):           # Loop through valid batches:
             mean_loss = sess.run(self.valid_loss, feed_dict={X_val: X_data_valid, Y_val: Y_data_valid })
             if math.isnan(mean_loss):
                 print('valid cost is NaN')
@@ -276,7 +289,7 @@ class CNN(object):
     def train(self, sess):
         start_time = time.clock()
 
-        n_early_stop_epochs =  # Define it
+        n_early_stop_epochs = 100  # Define it
         n_epochs = 100  # Define it
 
         saver = tf.train.Saver(
