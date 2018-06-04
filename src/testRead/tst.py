@@ -9,10 +9,10 @@ import read_img as rim
 
 #check read dir_name
 # cmpl=rim.read_cmp_dir("ASVspoof2017_V2_train_fbank")
-# print(cmpl)
+# print(cmpl[0],cmpl[1])
 #check read labels--ok -chk onnly path of protocol_V2 dir
 #cl_types= rim.read_label("train_info.txt")
 #print(cl_types)
 
 #check read data
-data,nframes=rim.read_Data("ASVspoof2017_V2_train_fbank","train_info.txt" )
+Xdata,Υdata,nframes=rim.read_Data("ASVspoof2017_V2_train_fbank","train_info.txt" )
