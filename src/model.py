@@ -77,12 +77,11 @@ def max_pool(x, stride, k):
     # return (tf.nn.softmax(tf.matmul(in_s,W)))
 #--------------------------------------------------------------------------------------------
 
-
+#dense 1st try
 def dense_layer(inp, size):
 
     dense = tf.layers.dense(inputs=inp, units=size, activation=tf.nn.relu)
     dropout = tf.layers.dropout(inputs=dense, rate=0.2, training = tf.estimator.ModeKeys.TRAIN)
-
 
     #tf.nn.softmax(logits,axis=-1,name="GenOrSpoof",dim=2)
 
@@ -106,10 +105,16 @@ class CNN(object):
         self.chan = 1  # channel of image 1 or 3 if rgb
         self.n_classes = 2  # genuine or spoof --number of classes
         self.batch_size = 256  # 64 || 128 || 256
+
         self.train_size = 1587420  # number of files
         self.dev_size = 1029721  # number of files in dev/
         self.eval_size = 8522944
 
+    #normalize input data
+    def normalize(self,X):
+        col_max=np.max(X,axis=0)
+        col_min=np.min(X,axis=0)
+        normX=np.divide(X-col_min,col_max-col_min)
 
     def inference(self, X, reuse=True, is_training=True):
         with tf.variable_scope("inference", reuse=reuse):
@@ -121,24 +126,24 @@ class CNN(object):
             # init phase
             shape1 = [3, 3, 1, 4]  # [filter_h,filter_w,in_channel,out_channel]
             w = weight_dict(shape1)
-            b = bias_dict([shape1[3]])
+            b = bias_dict([shape1[3]]) #out_channel== n_hidden
             conv1 = conv2d(X, w) + b  # init_convolution
 
     # -----------1st set--------{2 blocks}---------------------------------------
             # -------1st block
             shape1 = [3, 3, 1, 8]
             conv_l1 = conv_layer(conv1, shape1)
-            batch_norm1 = batch_n(conv_l1)  # normalization
+            batch_norm1 = batch_n(conv_l1)          #batch normalization
             conv_l2 = conv_layer(batch_norm1, shape1)
-            batch_norm2 = batch_n(conv_l2)  # normalization batch
+            batch_norm2 = batch_n(conv_l2)           # batch normalization
 
             mpool_1 = max_pool(batch_norm2, 1, 1)  # stride =1 , k=1
             # ------2nd block
             shape2 = [3, 3, 1, 8]
             conv_l3 = conv_layer(mpool_1, shape2)
-            batch_norm3 = batch_n(conv_l3)  # normalization
+            batch_norm3 = batch_n(conv_l3)           #batch normalization
             conv_l4 = conv_layer(batch_norm3, shape2)
-            batch_norm4 = batch_n(conv_l4)  # normalization batch
+            batch_norm4 = batch_n(conv_l4)          #batch normalization
 
             mpool_2 = max_pool(batch_norm4, 1, 1)  # stride =1 , k=1
 
@@ -193,9 +198,7 @@ class CNN(object):
 
         # --- Train computations
         #self.trainDataReader = trainDataReader
-        # shaping variables--
 
-        # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
         X_data_train = tf.placeholder(tf.float32, shape=(
             None, self.height, self.width, self.chan))  # Define this
@@ -203,8 +206,9 @@ class CNN(object):
         Y_data_train = tf.placeholder(
             tf.int32, shape=(None, self.n_classes))  # Define this
 
+        # Network prediction
         Y_net_train = self.inference(
-            X_data_train, reuse=False)  # Network prediction
+            X_data_train, reuse=False)
 
         # Loss of train data
         self.train_loss = tf.reduce_mean(tf.nn.sparce_softmax_cross_entropy_with_logits(
@@ -323,6 +327,16 @@ class CNN(object):
         self.Y_net_test = self.inference(
             self.X_data_test_placeholder, reuse=False)
 
-    def predict_utterance(self, sess, testDataReader, dataWriter):
-        # Define it
-        pred=self.inference()
+    def predict_utterance(self, sess,Yeval):
+
+        Yhat=self.Y_net_test # variables of functions are the visible with self.??
+
+        Ypredict=tf.argmax(Yhat,axis=1,output_type=tf.int32)
+        Ycorrect=tf.argmax(Y,axis=1,output_type=tf.int32)
+
+        #CAst boolean tensor to float
+        corrrect=tf.cast(tf.equal(Ypredict,Ycorrect),tf.float32)
+        accuracy=tf.reduce_mean(correct)
+        #accuracy=sess.run(accuracy_graph,feed_dict={X: self.X_data_train, Y: Y_data_train})
+
+        return accuracy
