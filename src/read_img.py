@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 #very IMPORTANT to define the path ,dir_n
 #check your project directories
 
-path = "../../protocol_V2"  # check and define it properly
+path = "../protocol_V2"  # check and define it properly
 dir_n="/home/tassos/Desktop/ASV/DATA" #check and define where is your DATA dir
 # read if .wav file is genuine or spoof --create label
 # as filename put the full path of train_info file in protocolv2 dir
