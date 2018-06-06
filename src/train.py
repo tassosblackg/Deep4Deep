@@ -11,7 +11,7 @@ model_id = get_model_id()
 
 # Create the network
 network = CNN(model_id)
-
+network.input()
 
 # Define the train computation graph
 network.define_train_operations()
