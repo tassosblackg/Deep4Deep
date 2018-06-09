@@ -22,12 +22,13 @@ def read_label(filename):
             l_words = line.split(" ")  # seperate words by space
             # files_n.append(l_words[0])
             if(l_words[1] == "genuine"):
-                class_type.extend('1')
+                class_type.append(1)
             elif (l_words[1] == "spoof"):
-                class_type.extend('0')
+                class_type.append(0)
             else:
                 pass
-
+            #print(class_type)
+            #print("l="+str(len(class_type)))
     return class_type
 
 
@@ -109,6 +110,8 @@ def read_stage1(dir_name, info_fl):
         total_nframes+=nframes #all images
         data_l.append(cmp2img) #keep all imgs -- a list with numpy array
     print("end of loop1..\n")
+    # print(types[0])
+    # print(len(types))
     del(cl_types)
     del(cmp_l)
     return data_l,types,total_nframes
@@ -120,15 +123,16 @@ def read_stage2(data,types,total_nframes):
 
     # #create all_params np array
     all_imgs=np.zeros(shape=(total_nframes,dim,width,1),dtype=np.float32) #initialize np array
-    all_labels=np.zeros(shape=(total_nframes,1),dtype=np.float32) #repeat labels type for each frame
+    all_labels=np.zeros(shape=(total_nframes, ),dtype=np.int32) #repeat labels type for each frame
     indx=0
     # # #iterate through list objects(numpy elements)
     for l in range(data.__len__()):
         cframes=data[0].shape[0]
         all_imgs[indx:indx+cframes,:]=data.pop(0)
-        all_labels[indx:indx+cframes,:]=types.pop(0)
+        all_labels[indx:indx+cframes]=types.pop(0)
         indx=indx+cframes
-
+    # print(all_imgs.shape)
+    # print(all_labels.shape)
     #free space
     del(data)
     del(types)
