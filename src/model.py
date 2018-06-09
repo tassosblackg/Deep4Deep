@@ -45,36 +45,11 @@ def conv_layer(inp, shape):
     b = bias_dict([shape[3]])
     return(tf.nn.relu(conv2d(inp, W) + b))
 # define max pooling function
-
-
 def max_pool(x, stride, k):
     return (tf.nn.max_pool(x, strides=[1, 2, stride, 1], ksize=[1, 2, k, 1], padding='VALID'))
 
-# define dense layers--last block of layers
 
 
-# def full_layer(input, size,l2_loss):
-#     in_size=int(input.get_shape()[1])
-#     W=weight_variable([in_size,size])
-#     b=bias_variable([size])
-#     l2_loss += tf.nn.l2_loss(W)+tf.nn.l2_loss(b)
-#     return tf.matmul(input,W)+b,l2_loss
-#
-#  # flat = tf.reshape(inp, [-1, 7 * 7 * 64])
-#
-#  #Fully-Connected Layer 1
-#         full_1,l2_loss=full_layer(reshaped,2048,l2_loss)
-#         full_1=tf.nn.relu(full_1)
-#         full_drop_1=tf.nn.dropout(full_1,keep_prob=self.dropout_keep_prob)    #Perform dropout on fully connected layer
-#
-# --------------------------------------------------------------------------------------------
-    # in_s = int(inp.getshape()[1])  # flatten layer
-    # W = weight_dict([in_s, size])
-    # b = bias_dict(shape)
-    # # loss+=
-    # return (tf.matmul(inp, W), loss)
-    # return (tf.nn.softmax(tf.matmul(in_s,W)))
-# --------------------------------------------------------------------------------------------
 #flatten layer
 def flatten_l(inp):
     flatten_size=inp.shape[1]*inp.shape[2]*inp.shape[3]
@@ -117,10 +92,7 @@ class CNN(object):
         self.Ytrain_in = np.empty(0)
         self.Xvalid_in = np.empty(0)
         self.Yvalid_in = np.empty(0)
-        # index of X_train data for shuffling the input batches
-        self.tindx = np.empty(0)
-        # index of valid data for shuffling the input batches
-        self.vindx = np.empty(0)
+
         # __________________________________________________
         self.height = 64
         self.width = 17
@@ -137,30 +109,43 @@ class CNN(object):
         col_max = np.max(X, axis=0)
         col_min = np.min(X, axis=0)
         normX = np.divide(X - col_min, col_max - col_min)
-
+        return normX
     # read input data
     def input(self):
         self.Xtrain_in, self.Ytrain_in, self.train_size = rim.read_Data(
             "ASVspoof2017_V2_train_fbank", "train_info.txt")  # Read Train data
+        # print(self.Xtrain_in)
         # Normalize input train set data
         self.Xtrain_in = self.normalize(self.Xtrain_in)
-        # if type(self.Xtrain_in) is np.ndarray :
-        #     print("YES")
-        # create an numpy array with ints matching the #of train data
-        self.tindx = np.arange(self.train_size)
-
+        print(self.Ytrain_in)
+        print("shape"+str(self.Ytrain_in.shape))
         self.Xvalid_in, self.Yvalid_in, self.dev_size = rim.read_Data(
             "ASVspoof2017_V2_train_dev", "dev_info.txt")  # Read validation data
         # Normalize input validation set data
         self.Xvalid_in = self.normalize(self.Xvalid_in)
-        # (self.Xvalid_in).flatten()    #create 1-D array
-        self.vindx = np.arange(self.dev_size)
+        print(self.Yvalid_in)
+        print("shape"+str(self.Yvalid_in.shape))
     # shuffle index so to get with random order the data
-
-    def shuffling(self, indx):
+    def shuffling(self, X,Y):
+        indx=np.arange(len(X))      #create a array with indexes for X data
         np.random.shuffle(indx)
+        X=X[indx]
+        Y=Y[indx]
+        # print("shuffle")
+        # print(Y.shape)
+        return X,Y
+    #take X batch and Ybatch
+    def read_nxt_batch(self,X,Y,batch_s,indx=0):
+        if(indx+batch_s <len(X)):     # check and be sure that you're in range
+            print(Y.shape)
+            X=X[indx:indx+batch_s]  #take a batch from shuffled data 0..255 is 256!
+            Y=Y[indx:indx+batch_s]  #take a batch from shuffled labels
+            indx+=batch_s           #increase indx, move to indx the next batch
+            return(X,Y,indx)
+        else:
+            return None,None,None
 
-    def inference(self, X, reuse=True, is_training=True):
+    def inference(self, X, keep_prob,reuse=True,is_training=True):
         with tf.variable_scope("inference", reuse=reuse):
             # Implement your network here
             # equation or predefiend fuctions --convolution operation
@@ -213,38 +198,36 @@ class CNN(object):
             batch_norm10 = batch_n(conv_l10)
 
             mpool_5 = max_pool(batch_norm10, 2, 2)      # stride=2, k=2
-            print("SHAPE../n")
-            print(mpool_5.shape)
-            print(mpool_5.shape[1].value)
+            # print("SHAPE../n")
+            # print(mpool_5.shape)
+            # print(mpool_5.shape[1].value)
 
     # ------------add dense layers {4 layers}-------------------------------------
 
             flatt_out=flatten_l(mpool_5)        #flatten out tensor from 4D to 2D
             l=fully_con(flatt_out,256)           #1st dense-relu layer
             l=fully_con(l,512)                 #2nd
-            #l=tf.nn.dropout(l,keep_prob=keep_prob)
+            l=tf.nn.dropout(l,keep_prob=keep_prob)
 
             logits=outp_layer(l,self.n_classes) #propability decision between two classes (Genuine or Spoofed)
-
+            # print("$$")
+            # print(logits.shape)
         return logits
 
     def define_train_operations(self):
 
-        #keep_prob=tf.placeholder(tf.float32,name='keep_prob')       #placeholder for keeping dropout probality
+        self.keep_prob=tf.placeholder(tf.float32,name='keep_prob')       #placeholder for keeping dropout probality
 
-        X_data_train = tf.placeholder(dtype=tf.float32, shape=(
-            None, self.height,self.width,self.chan))  # Define this
+        self.X_data_train = tf.placeholder(dtype=tf.float32, shape=(None, self.height,self.width,self.chan),name='X_data_train')  # Define this
 
-        Y_data_train = tf.placeholder(
-            dtype=tf.int32, shape=(None, self.n_classes))  # Define this
+        self.Y_data_train = tf.placeholder(dtype=tf.int32, shape=(None, ),name='Y_data_train')  # Define this
 
         # Network prediction
         Y_net_train = self.inference(
-            X_data_train,reuse=False)
+            self.X_data_train,self.keep_prob,reuse=False)
 
         # Loss of train data tf.nn.softmax_cross_entropy_with_logits
-        self.train_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(
-            labels=Y_data_train, logits=Y_net_train, name='train_loss'))
+        self.train_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.Y_data_train, logits=Y_net_train, name='train_loss'))
 
         # define learning rate decay method
         global_step = tf.Variable(0, trainable=False, name='global_step')
@@ -260,32 +243,34 @@ class CNN(object):
             self.train_loss, var_list=trainable, global_step=global_step)
 
         # --- Validation computations
-        X_data_valid = tf.placeholder(dtype=tf.float32, shape=(
-            None, self.height, self.width, self.chan))  # Define this
-        Y_data_valid = tf.placeholder(
-            dtype=tf.int32, shape=(None, self.n_classes))  # Define this
+        self.X_data_valid = tf.placeholder(dtype=tf.float32, shape=(None, self.height, self.width, self.chan))  # Define this
+        self.Y_data_valid = tf.placeholder(dtype=tf.int32, shape=(None, ))  # Define this
 
         # Network prediction
-        Y_net_valid = self.inference(
-            X_data_valid,reuse=True)
-
+        Y_net_valid = self.inference(self.X_data_valid,self.keep_prob,reuse=True)
+        # print("Ydata_valid.shape="+str(self.Y_data_valid.shape))
         # Loss of validation data
-        self.valid_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(
-            labels=Y_data_valid, logits=Y_net_valid, name='valid_loss'))
+        self.valid_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
+            labels=self.Y_data_valid, logits=Y_net_valid, name='valid_loss'))
 
     # def read_nxt_batch(self):
 
     def train_epoch(self, sess):
+        print("Train_epoch")
         train_loss = 0
         total_batches = 0
-        keep_probability=0.2     #dropout probability
+        # print("TOTAL="+str(self.train_size))
         n_batches = self.train_size / self.batch_size  # ??
-        self.shuffling(self.tindx)  # shuffle
-        while (total_batches < n_batches):     # loop through train batches:
-            mean_loss, _ = sess.run([self.train_loss, self.update_ops], feed_dict={'X_train': self.Xtrain_in[self.tindx[(total_batches * self.batch_size):(total_batches + 1) * (self.batch_size - 1)]],'Y_train': self.Ytrain_in[self.tindx[(total_batches * self.batch_size):(total_batches + 1) * (self.batch_size - 1)]] })
+        indx=0
+        X,Y=self.shuffling(self.Xtrain_in,self.Ytrain_in)  # shuffle X ,Y data
+        Xbatch,Ybatch,indx=self.read_nxt_batch(X,Y,self.batch_size,indx)    # take the right batch
+        while Xbatch is not None:     # loop through train batches:
+            # print("Ybatch=")
+            # print(Ybatch.shape)
+            mean_loss, _ = sess.run([self.train_loss, self.update_ops], feed_dict={self.X_data_train: Xbatch ,self.Y_data_train: Ybatch,self.keep_prob:0.3})
+            Xbatch,Ybatch,indx=self.read_nxt_batch(X,Y,self.batch_size,indx)
             if math.isnan(mean_loss):
                 print('train cost is NaN')
-
                 break
             train_loss += mean_loss
             total_batches += 1
@@ -296,14 +281,20 @@ class CNN(object):
         return train_loss
 
     def valid_epoch(self, sess):
+        print("Valid_epoch")
+
         valid_loss = 0
         total_batches = 0
         keep_probability=0.0     #dropout probability
         n_batches = self.dev_size / self.batch_size  # number of elements
-        self.shuffling(self.vindx)  # shuffle
+        indx=0
+        X,Y=self.shuffling(self.Xvalid_in,self.Yvalid_in)  # shuffle X ,Y data
+        Xbatch,Ybatch,indx=self.read_nxt_batch(X,Y,self.batch_size,indx)    # take the right batch
         # Loop through valid batches:
-        while (total_batches < n_batches):
-            mean_loss = sess.run(self.valid_loss, feed_dict={'X_val': self.Xvalid_in[self.vindx[total_batches * self.batch_size: (total_batches + 1) * (self.batch_size - 1)]],'Y_val': self.Ytrain_in[self.vindx[total_batches * self.batch_size : (total_batches + 1) * (self.batch_size - 1)] ]})
+        while Xbatch is not None  :
+            # print("batch_i="+str(total_batches)+"/"+str(n_batches)+"\n")
+            mean_loss = sess.run(self.valid_loss, feed_dict={self.X_data_valid: Xbatch,self.Y_data_valid: Ybatch,self.keep_prob:1.0})
+            Xbatch,Ybatch,indx=self.read_nxt_batch(X,Y,self.batch_size,indx)
             if math.isnan(mean_loss):
                 print('valid cost is NaN')
                 break
@@ -318,11 +309,10 @@ class CNN(object):
     def train(self, sess):
         start_time = time.clock()
 
-        n_early_stop_epochs = 100  # Define it
-        n_epochs = 100  # Define it
+        n_early_stop_epochs = 10  # Define it
+        n_epochs = 50  # Define it
 
-        saver = tf.train.Saver(
-            var_list = tf.trainable_variables(), max_to_keep = 4)
+        saver = tf.train.Saver(var_list = tf.trainable_variables(), max_to_keep = 4)
 
         early_stop_counter=0
 
@@ -332,13 +322,13 @@ class CNN(object):
 
         min_valid_loss=sys.float_info.max
         epoch=0
-        while (epoch < n_epochs):
+        while (epoch < n_epochs): #max num epoch iteration
             epoch += 1
             epoch_start_time=time.clock()
 
             train_loss=self.train_epoch(sess)
             valid_loss=self.valid_epoch(sess)
-
+            # print("valid ends")
             epoch_end_time=time.clock()
 
             info_str='Epoch='+str(epoch) + ', Train: ' + str(train_loss) + ', Valid: '
@@ -363,13 +353,14 @@ class CNN(object):
 
     def define_predict_operations(self):
         self.X_data_test_placeholder=tf.placeholder(dtype=tf.float32, shape = (None, self.height,self.width,self.chan))  # ??
-
+        self.keep_prob_placeholder=tf.placeholder(dtype=tf.float32,name='keep_prob')
+        self.Y_data_test_placeholder=tf.placeholder(dtype=tf.int32,shape=(None, ))
         self.Y_net_test=self.inference(
-            self.X_data_test_placeholder,keep_prob ,reuse = False)
+            self.X_data_test_placeholder,self.keep_prob_placeholder ,reuse = False,is_training=False)
 
     def predict_utterance(self, sess, Xeval, Yeval):
-        keep_probability=0.0
-        Yhat=self.Y_net_test  # variables of functions are the visible with self.??
+        keep_probability=1.0
+        Yhat=self.Y_net_test  # logits
 
         Ypredict=tf.argmax(Yhat, axis = 1, output_type = tf.int32)
         Ycorrect=tf.argmax(Yeval, axis = 1, output_type = tf.int32)
@@ -377,6 +368,6 @@ class CNN(object):
         # CAst boolean tensor to float
         correct=tf.cast(tf.equal(Ypredict, Ycorrect), tf.float32)
         accuracy_graph=tf.reduce_mean(correct)
-        accuracy=sess.run(accuracy_graph, feed_dict = {'X': Xeval, 'Y': Yeval, 'keep_prob':keep_probability})
+        accuracy=sess.run(accuracy_graph, feed_dict = {self.X_data_test_placeholder: Xeval, self.Y_data_test_placeholder: Yeval, self.keep_prob_placeholder:keep_probability})
 
         return accuracy
