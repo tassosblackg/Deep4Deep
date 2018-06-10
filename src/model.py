@@ -137,7 +137,7 @@ class CNN(object):
     #take X batch and Ybatch
     def read_nxt_batch(self,X,Y,batch_s,indx=0):
         if(indx+batch_s <len(X)):     # check and be sure that you're in range
-            print(Y.shape)
+            # print(Y.shape)
             X=X[indx:indx+batch_s]  #take a batch from shuffled data 0..255 is 256!
             Y=Y[indx:indx+batch_s]  #take a batch from shuffled labels
             indx+=batch_s           #increase indx, move to indx the next batch
@@ -282,10 +282,8 @@ class CNN(object):
 
     def valid_epoch(self, sess):
         print("Valid_epoch")
-
         valid_loss = 0
         total_batches = 0
-        keep_probability=0.0     #dropout probability
         n_batches = self.dev_size / self.batch_size  # number of elements
         indx=0
         X,Y=self.shuffling(self.Xvalid_in,self.Yvalid_in)  # shuffle X ,Y data
@@ -309,8 +307,8 @@ class CNN(object):
     def train(self, sess):
         start_time = time.clock()
 
-        n_early_stop_epochs = 10  # Define it
-        n_epochs = 50  # Define it
+        n_early_stop_epochs = 12  # Define it
+        n_epochs = 20  # Define it
 
         saver = tf.train.Saver(var_list = tf.trainable_variables(), max_to_keep = 4)
 
