@@ -24,12 +24,13 @@ sess = tf.Session()
 
 restore_variables(sess)
 
-
-
+indx=0
+network.batch_size=64
 # Iterate through eval files and calculate the classification scores
-#read eval files, iteration, score
+# --read data and evaluate for batch_size 64 for all images
 for i in range(network.eval_size):  #how many images
-   network.predict_utterance(sess,Xeval,Yeval)
+   Xbatch,Ybatch,indx=network.read_nxt_batch(Xeval,Yeval,network.batch_size,indx)
+   network.predict_utterance(sess,Xbatch,Ybatch)
 
 
 sess.close()
