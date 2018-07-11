@@ -80,7 +80,7 @@ def outp_layer(inp,n_outp):
 
 # batch normalization
 def batch_n(convl):
-    return (tf.nn.relu(tf.contrib.layers.batch_norm(convl)))
+    return (tf.nn.relu(tf.contrib.layers.batch_norm(convl,scale=True)))
 # -------------------------------------------------------------------------------------------------------
 
 
@@ -175,6 +175,9 @@ class CNN(object):
 
             mpool_2 = max_pool(batch_norm4, 1, 1)   # stride =1 , k=1
 
+            #dropout layer
+            mpool_2=tf.nn.dropout(l,keep_prob=keep_prob)
+
     # --------2nd set------{3 blocks}--------------------------------------------
             # -------3d block
             conv_l5 = conv_layer(mpool_2, [3, 3, 8, 16])
@@ -207,7 +210,7 @@ class CNN(object):
             flatt_out=flatten_l(mpool_5)        #flatten out tensor from 4D to 2D
             l=fully_con(flatt_out,256)           #1st dense-relu layer
             l=fully_con(l,512)                 #2nd
-            l=tf.nn.dropout(l,keep_prob=keep_prob)
+
 
             logits=outp_layer(l,self.n_classes) #propability decision between two classes (Genuine or Spoofed)
             # print("$$")
