@@ -10,7 +10,7 @@ In this project we implement a 10-layer CNN for classification of a speech file(
 
 - We have up to 5 blocks, each block has 2 convolution + 1 max_pooling layer 
 
- * (->apply batch_normalization after each convolutional layer)
+ * Apply batch_normalization after each convolutional layer
 
 - We use up to 64 outputchannels per layer(instead of 256, that is proposed on vd10-fpad-tpad)..
 
@@ -24,8 +24,11 @@ see: VeryDeepCNN.pdf in docs/
 @Results:
 ---------
 Stil waiting for a decent GPU to train and test the model..
+
 Because it's impossible to train and evaluate this model with a mid-range laptop's CPU
+
 Soon It will be updated
+
 We compare our results with those referred at
 
 docs/ Kinnunen_2017_The_ASVspoof_2017_challenge_Assessing_the_limits_of_replay_spoofing_attack_detection.pdf
