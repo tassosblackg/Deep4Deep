@@ -2,6 +2,21 @@
 CNN implementation for ASV using tensorflow
 
 Anti-Spoofing speech recognition classification (based on ASV2017 contest)
+------------------------------------------------------------------------------
+Requirements:
+-------------
+
+Python 2.7 or higher
+
+- Tensorflow Framework (build from source preffered)
+- SoundFile 
+	pip install SoundFile
+- Librosa
+	pip install librosa
+- matplotlib
+	pip install matplotlib
+- Tkinter 
+	sudo apt-get install pythonX-tk , where X is the needed python version 2,3
 
 -------------------------------------------------------------------------------
 @Architecture:
@@ -23,7 +38,7 @@ see: VeryDeepCNN.pdf in docs/
 
 @Results:
 ---------
-Stil waiting for a decent GPU to train and test the model..
+Still waiting for a decent GPU to train and test the model..
 
 Because it's impossible to train and evaluate this model with a mid-range laptop's CPU
 
