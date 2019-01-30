@@ -1,7 +1,7 @@
 # ASV --anti spoofing project 2018--based on papers
 # that's where you implement your model's graph and execution functionality
 # for feature maps 17x64 we can get up to 10 layers CNN(V.DCNN)
-# we should try first the baseline CNN ?? is that implemented in the given matlab code??
+#model.py describes model architecture and basic trainning and validation operations for our model
 # So we only design our V.D.CNN
 
 # Bonus: ->batch normalization
@@ -19,31 +19,27 @@ from lib.model_io import save_variables
 from lib.precision import _FLOATX
 import read_img as rim
 # ------define architecture functions--------------------------------------------------------------
+
 # define weights
-
-
 def weight_dict(shape):
     init = tf.truncated_normal(shape, stddev=0.1)
     return(tf.Variable(init))
+
 # define bias--optional
-
-
 def bias_dict(shape):
     init = tf.constant(0.1, shape=shape)
     return(tf.Variable(init))
 
 # return convolution result --optional add bias
-
-
 def conv2d(x, W, stride=1):
     return(tf.nn.conv2d(x, W, strides=[1, stride, stride, 1], padding='SAME'))
+
 # define convolution layer
-
-
 def conv_layer(inp, shape):
     W = weight_dict(shape)
     b = bias_dict([shape[3]])
     return(tf.nn.relu(conv2d(inp, W) + b))
+
 # define max pooling function
 def max_pool(x, stride, k):
     return (tf.nn.max_pool(x, strides=[1, 2, stride, 1], ksize=[1, 2, k, 1], padding='VALID'))
