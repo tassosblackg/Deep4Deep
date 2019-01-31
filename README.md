@@ -2,7 +2,7 @@
 CNN implementation for ASV using tensorflow
 
 Anti-Spoofing speech recognition classification (based on ASV2017 contest)
-------------------------------------------------------------------------------
+__________________________________________________________________________________________________________________________
 **_Requirements:_**
 -----------------
 
@@ -18,10 +18,29 @@ Python 2.7 or higher
 - **Tkinter** 
   > sudo apt-get install pythonX-tk , *where X is the needed python version 2,3*
 
--------------------------------------------------------------------------------
+_________________________________________________________________________________________________________________________
+**_Preprocessing:_**
+--------------------
+Create filter banks [windows from sound files] for each data set
+
+> run make_fbanks.py settype, path
+  - settype arg: 'train', 'dev', 'eval' for each dataset
+  - path arg: path to where data set are
+
+- *Filter Banks:* are an alterantive way for sampling a signal and get usefull coefficients as features of the signal. 
+
+With this technique we sample the signal and group past,current and future windows in a specific range for the parts of the signal 
+
+and build frames. These frames will be used to feed them in our CNN model.
+
+*Other feature extraction technique for sound signal is MFCC*
+> More infos:
+
+*Check projectDescription in Docs*
+_________________________________________________________________________________________________________________________
 **_Architecture:_**
 -------------------
-In this project we implement a 10-layer CNN for classification of a speech file(.wav) into 2 classes (Genuine or Spoof)
+In this project we implement a *10-layer CNN* for classification of a speech file(.wav) into 2 classes (Genuine or Spoof)
 
 - We have up to 5 blocks, each block has 2 convolution + 1 max_pooling layer 
 
