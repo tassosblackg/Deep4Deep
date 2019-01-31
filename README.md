@@ -33,7 +33,8 @@ With this technique we sample the signal and group past,current and future windo
 and build frames.These frames will be used to feed them in our CNN model.
 
 *Other feature extraction technique for sound signal is MFCC*
- **More infos:**
+ 
+**More infos:**
 
  > *Check projectDescription in Docs*
 _________________________________________________________________________________________________________________________
