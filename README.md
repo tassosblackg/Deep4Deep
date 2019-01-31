@@ -32,7 +32,7 @@ Create filter banks [*windows from sound files*] for each data set.
 With this technique we sample the signal and group past,current and future windows with a specific sampling-period for the parts of the signal 
 and build frames.These frames will be used to feed them in our CNN model.
 
-*Other feature extraction technique for sound signal is MFCC*
+*Other feature extraction technique for sound signal is MFCC.*
  
 **More infos:**
 
