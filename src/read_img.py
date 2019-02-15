@@ -33,13 +33,13 @@ def read_label(filename):
 
 
 # read  all files' name from directory and create an array of them
-def read_cmp_dir(folder_name):
+def read_cmp_dir(folder_name,n_files):
     files = g.glob(dir_n+"/"+folder_name + "/*.cmp")
-    #print(files)
+    
     cmp_list = []
-    for i in range(files.__len__()):
-        cmp_list.append(read_cmp_file(files[i]))
-    #print(cmp_list.__len__())
+    # for i in range(files.__len__()):
+    #     cmp_list.append(read_cmp_file(files[i]))
+
     return cmp_list
 
 
