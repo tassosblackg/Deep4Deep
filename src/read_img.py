@@ -40,7 +40,7 @@ def read_cmp_dir(folder_name,n_files):
     cmp_list = []
     if os.path.exists("read_status.txt"):
         f = open("read_status.txt","r")
-        left_overs = f.readline()
+        left_overs = int(f.readline())
         f.close()
     else:
         left_overs = 0
@@ -51,7 +51,10 @@ def read_cmp_dir(folder_name,n_files):
         start_i+=1
     # for i in range(files.__len__()):
     #     cmp_list.append(read_cmp_file(files[i]))
-
+    left_overs=total_files-n_files
+    # write left_overs in file for next session
+    f = open("read_status.txt","w")
+    f.write(str(left_overs))
     return cmp_list
 
 
