@@ -34,9 +34,19 @@ def read_label(filename):
 
 # read  all files' name from directory and create an array of them
 def read_cmp_dir(folder_name,n_files):
-    files = g.glob(dir_n+"/"+folder_name + "/*.cmp")
-    
+    files, total_files = g.glob(dir_n+"/"+folder_name + "/*.cmp"),len(files)
+
+
     cmp_list = []
+    if os.path.exists("read_status.txt"):
+        f = open("read_status.txt","r")
+        left_overs = f.readline()
+        f.close()
+    else:
+        left_overs = 0
+    start_i = total_files-left_overs # starting point of loop
+    end_i   = start_i+n_files # ending point
+    while ():
     # for i in range(files.__len__()):
     #     cmp_list.append(read_cmp_file(files[i]))
 
