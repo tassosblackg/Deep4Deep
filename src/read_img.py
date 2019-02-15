@@ -46,7 +46,9 @@ def read_cmp_dir(folder_name,n_files):
         left_overs = 0
     start_i = total_files-left_overs # starting point of loop
     end_i   = start_i+n_files # ending point
-    while ():
+    while (start_i<end_i):
+        cmp_list.append(read_cmp_file(files[start_i]))
+        start_i+=1
     # for i in range(files.__len__()):
     #     cmp_list.append(read_cmp_file(files[i]))
 
@@ -100,8 +102,8 @@ def convert_to_images(params):
 # args:
 # @dir_name : directory name where .cmp files are saved
 # @info_fl : text file where info about train,eval,dev sets are saved
-def read_stage1(dir_name, info_fl):
-    cmp_l = read_cmp_dir(dir_name)  # read .cmp files from dir
+def read_stage1(dir_name, info_fl,n_files):
+    cmp_l = read_cmp_dir(dir_name,n_files)  # read .cmp files from dir
     #print("\ncmp_nl data have been read...\n")
     cl_types = read_label(info_fl)  # read label from info file
     #print("\ncl_types have been read...\n")
@@ -156,8 +158,8 @@ def read_stage2(data,types,total_nframes):
     # return 10,100
 
 # Read totally-- all files and labels
-def read_Data(dir_name, info_fl):
-    data,types,tframes=read_stage1(dir_name,info_fl)
+def read_Data(dir_name, info_fl,n_files):
+    data,types,tframes=read_stage1(dir_name,info_fl,n_files)
     return(read_stage2(data,types,tframes))
     # return 10,100
 
