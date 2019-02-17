@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 # very IMPORTANT to define the path ,dir_n
 # check your project directories
 
-path = "../protocol_V2"               # check and define it properly
-dir_n="/home/tassos/Desktop/ASV/DATA" # check and define where is your DATA dir
+path = "../../protocol_V2"               # check and define it properly
+dir_n="/home/tassos/Desktop/DATA_ASR" # check and define where is your DATA dir
 
 # read if .wav file is genuine or spoof --create label
 # as filename put the full path of train_info file in protocolv2 dir
@@ -42,24 +42,28 @@ def read_cmp_dir(folder_name,n_files):
         left_overs = int(f.readline())
         f.close()
     else:
-        left_overs = 0
+        left_overs = total_files    # first read attempt
+
 
     start_i = total_files-left_overs # starting point of loop
-    if (left_overs<n_files && left_overs!=0) :
+    if (left_overs<n_files) :
         end_i = start_i + left_overs
+        left_overs = 0
     else:
         end_i = start_i+n_files     # ending point
+        left_overs=left_overs-n_files
 
     while (start_i<end_i):
         cmp_list.append(read_cmp_file(files[start_i]))
         start_i+=1
-    # for i in range(files.__len__()):
-    #     cmp_list.append(read_cmp_file(files[i]))
-    left_overs=total_files-n_files
-    # write left_overs in file for next session
-    f = open("read_status.txt","w")
-    f.write(str(left_overs))
-    f.close()
+    if (left_overs != 0):
+        # write left_overs in file for next session
+        f = open("read_status.txt","w")
+        f.write(str(left_overs))
+        f.close()
+    else:
+        os.remove("read_status.txt")
+        
     return cmp_list
 
 
@@ -159,7 +163,7 @@ def read_stage2(data,types,total_nframes):
 
     # all_data=np.concatenate((all_imgs,all_labels),axis=0)
     print("Data have been read...!\n")
-    #save to file --run only once
+    # save to file --run only once
     # np.save("Xdata",all_imgs)
     # np.save("Ydata",all_labels)
     return all_imgs,all_labels,total_nframes
