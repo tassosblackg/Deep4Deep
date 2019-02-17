@@ -16,8 +16,9 @@ network.input()
 # Define the train computation graph
 network.define_train_operations()
 
+with tf.device("/gpu0:")
 # Train the network
-sess = tf.Session()
+sess = tf.Session(config=tf.ConfigProto(log_device_placement=True)) #session with log about gpu exec
 try:
     network.train(sess)
 except KeyboardInterrupt:

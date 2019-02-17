@@ -80,6 +80,8 @@ def batch_n(convl):
 # -------------------------------------------------------------------------------------------------------
 
 
+# CNN model class
+
 class CNN(object):
 
     def __init__(self, model_id=None):
@@ -106,9 +108,10 @@ class CNN(object):
         col_min = np.min(X, axis=0)
         normX = np.divide(X - col_min, col_max - col_min)
         return normX
+
     # read input data
     def input(self):
-        self.Xtrain_in, self.Ytrain_in, self.train_size = rim.read_Data(
+        #?self.Xtrain_in, self.Ytrain_in, self.train_size = rim.read_Data(
             "ASVspoof2017_V2_train_fbank", "train_info.txt")  # Read Train data
         # print(self.Xtrain_in)
         # Normalize input train set data
@@ -121,6 +124,7 @@ class CNN(object):
         self.Xvalid_in = self.normalize(self.Xvalid_in)
         print(self.Yvalid_in)
         print("shape"+str(self.Yvalid_in.shape))
+
     # shuffle index so to get with random order the data
     def shuffling(self, X,Y):
         indx=np.arange(len(X))      #create a array with indexes for X data
@@ -130,7 +134,8 @@ class CNN(object):
         # print("shuffle")
         # print(Y.shape)
         return X,Y
-    #take X batch and Ybatch
+
+    # take X batch and Ybatch
     def read_nxt_batch(self,X,Y,batch_s,indx=0):
         if(indx+batch_s <len(X)):     # check and be sure that you're in range
             # print(Y.shape)
@@ -141,6 +146,7 @@ class CNN(object):
         else:
             return None,None,None
 
+    # build architecture
     def inference(self, X, keep_prob,reuse=True,is_training=True):
         with tf.variable_scope("inference", reuse=reuse):
             # Implement your network here
@@ -156,66 +162,73 @@ class CNN(object):
             conv1 = conv2d(X, w) + b    # init_convolution
 
     # -----------1st set--------{2 blocks}---------------------------------------
-            # -------1st block
-            conv_l1 = conv_layer(conv1, [3, 3, 1, 4])
-            batch_norm1 = batch_n(conv_l1)  # batch normalization
-            conv_l2 = conv_layer(batch_norm1, [3, 3, 4, 4])
-            batch_norm2 = batch_n(conv_l2)           # batch normalization
+            with tf.variable_scope("Set-1"):
+                # -------1st block
+                with tf.variable_scope("Block-1.1"):
+                    conv_l1 = conv_layer(conv1, [3, 3, 1, 4])
+                    batch_norm1 = batch_n(conv_l1)  # batch normalization
+                    conv_l2 = conv_layer(batch_norm1, [3, 3, 4, 4])
+                    batch_norm2 = batch_n(conv_l2)           # batch normalization
 
-            mpool_1 = max_pool(batch_norm2, 1, 1)   # stride =1 , k=1
-            # ------2nd block
-            conv_l3 = conv_layer(mpool_1, [3, 3, 4, 8])
-            batch_norm3 = batch_n(conv_l3)  # batch normalization
-            conv_l4 = conv_layer(batch_norm3, [3, 3, 8, 8])
-            batch_norm4 = batch_n(conv_l4)  # batch normalization
+                    mpool_1 = max_pool(batch_norm2, 1, 1)   # stride =1 , k=1
+                # ------2nd block
+                with tf.variable_scope("Block-1.2"):
+                    conv_l3 = conv_layer(mpool_1, [3, 3, 4, 8])
+                    batch_norm3 = batch_n(conv_l3)  # batch normalization
+                    conv_l4 = conv_layer(batch_norm3, [3, 3, 8, 8])
+                    batch_norm4 = batch_n(conv_l4)  # batch normalization
 
-            mpool_2 = max_pool(batch_norm4, 1, 1)   # stride =1 , k=1
+                    mpool_2 = max_pool(batch_norm4, 1, 1)   # stride =1 , k=1
 
-            #dropout layer
-            mpool_2=tf.nn.dropout(l,keep_prob=keep_prob)
+                #dropout layer
+                with tf.variable_scope("Dropout-1"):
+                    mpool_2=tf.nn.dropout(l,keep_prob=keep_prob)
 
     # --------2nd set------{3 blocks}--------------------------------------------
-            # -------3d block
-            conv_l5 = conv_layer(mpool_2, [3, 3, 8, 16])
-            batch_norm5 = batch_n(conv_l5)      # normalization
-            conv_l6 = conv_layer(batch_norm5, [3, 3, 16, 16])
-            batch_norm6 = batch_n(conv_l6)      # normalization batch
+        with tf.variable_scope("Set-2"):
+                # -------3d block
+                with tf.variable_scope("Block-2.1"):
+                    conv_l5 = conv_layer(mpool_2, [3, 3, 8, 16])
+                    batch_norm5 = batch_n(conv_l5)      # normalization
+                    conv_l6 = conv_layer(batch_norm5, [3, 3, 16, 16])
+                    batch_norm6 = batch_n(conv_l6)      # normalization batch
 
-            mpool_3 = max_pool(batch_norm6, 1, 1)   # stride =1 , k=1
-            # --------4th block
-            conv_l7 = conv_layer(mpool_3, [3, 3, 16, 32])
-            batch_norm7 = batch_n(conv_l7)
-            conv_l8 = conv_layer(batch_norm7, [3, 3, 32, 32])
-            batch_norm8 = batch_n(conv_l8)
+                    mpool_3 = max_pool(batch_norm6, 1, 1)   # stride =1 , k=1
+                # --------4th block
+                with tf.variable_scope("Block-2.2"):
+                    conv_l7 = conv_layer(mpool_3, [3, 3, 16, 32])
+                    batch_norm7 = batch_n(conv_l7)
+                    conv_l8 = conv_layer(batch_norm7, [3, 3, 32, 32])
+                    batch_norm8 = batch_n(conv_l8)
 
-            mpool_4 = max_pool(batch_norm8, 2, 2)   # stride=2, k=2
-            # --------5th blocks
+                    mpool_4 = max_pool(batch_norm8, 2, 2)   # stride=2, k=2
+                # --------5th blocks
+                with tf.variable_scope("Block-2.3"):
+                    conv_l9 = conv_layer(mpool_4, [3, 3, 32, 64])
+                    batch_norm9 = batch_n(conv_l9)
+                    conv_l10 = conv_layer(batch_norm9, [3, 3, 64, 64])
+                    batch_norm10 = batch_n(conv_l10)
 
-            conv_l9 = conv_layer(mpool_4, [3, 3, 32, 64])
-            batch_norm9 = batch_n(conv_l9)
-            conv_l10 = conv_layer(batch_norm9, [3, 3, 64, 64])
-            batch_norm10 = batch_n(conv_l10)
-
-            mpool_5 = max_pool(batch_norm10, 2, 2)      # stride=2, k=2
-            # print("SHAPE../n")
-            # print(mpool_5.shape)
-            # print(mpool_5.shape[1].value)
+                    mpool_5 = max_pool(batch_norm10, 2, 2)      # stride=2, k=2
+                    # print("SHAPE../n")
+                    # print(mpool_5.shape)
+                    # print(mpool_5.shape[1].value)
 
     # ------------add dense layers {4 layers}-------------------------------------
+        with tf.variable_scope("Dense Layer"):
+            flatt_out=flatten_l(mpool_5)        # flatten out tensor from 4D to 2D
+            l=fully_con(flatt_out,256)          # 1st dense-relu layer
+            l=fully_con(l,512)                  # 2nd
 
-            flatt_out=flatten_l(mpool_5)        #flatten out tensor from 4D to 2D
-            l=fully_con(flatt_out,256)           #1st dense-relu layer
-            l=fully_con(l,512)                 #2nd
 
-
-            logits=outp_layer(l,self.n_classes) #propability decision between two classes (Genuine or Spoofed)
+            logits=outp_layer(l,self.n_classes) # propability decision between two classes (Genuine or Spoofed)
             # print("$$")
             # print(logits.shape)
         return logits
 
     def define_train_operations(self):
 
-        self.keep_prob=tf.placeholder(tf.float32,name='keep_prob')       #placeholder for keeping dropout probality
+        self.keep_prob=tf.placeholder(tf.float32,name='keep_prob')       # placeholder for keeping dropout probality
 
         self.X_data_train = tf.placeholder(dtype=tf.float32, shape=(None, self.height,self.width,self.chan),name='X_data_train')  # Define this
 
@@ -348,6 +361,7 @@ class CNN(object):
         end_time=time.clock()
         print('Total time = ' + str(end_time - start_time))
 
+    # functionality during evaluation task
     def define_predict_operations(self):
         self.X_data_test_placeholder=tf.placeholder(dtype=tf.float32, shape = (None, self.height,self.width,self.chan))  # ??
         self.keep_prob_placeholder=tf.placeholder(dtype=tf.float32,name='keep_prob')

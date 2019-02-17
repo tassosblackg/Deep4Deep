@@ -10,11 +10,11 @@ import matplotlib.pyplot as plt
 
 path = "../protocol_V2"  # check and define it properly
 dir_n="/home/tassos/Desktop/ASV/DATA" #check and define where is your DATA dir
+
 # read if .wav file is genuine or spoof --create label
 # as filename put the full path of train_info file in protocolv2 dir
 def read_label(filename):
     full_path = os.path.join(path, filename)
-    # files_n = [] #save .wav file's name
     class_type = []  # save labels
     with open(full_path, 'r') as f:
         # read line by line
@@ -36,7 +36,6 @@ def read_label(filename):
 def read_cmp_dir(folder_name,n_files):
     files, total_files = g.glob(dir_n+"/"+folder_name + "/*.cmp"),len(files)
 
-
     cmp_list = []
     if os.path.exists("read_status.txt"):
         f = open("read_status.txt","r")
@@ -44,8 +43,13 @@ def read_cmp_dir(folder_name,n_files):
         f.close()
     else:
         left_overs = 0
+
     start_i = total_files-left_overs # starting point of loop
-    end_i   = start_i+n_files # ending point
+    if (left_overs<n_files && left_overs!=0) :
+        end_i = start_i + left_overs
+    else:
+        end_i = start_i+n_files # ending point
+
     while (start_i<end_i):
         cmp_list.append(read_cmp_file(files[start_i]))
         start_i+=1
@@ -55,6 +59,7 @@ def read_cmp_dir(folder_name,n_files):
     # write left_overs in file for next session
     f = open("read_status.txt","w")
     f.write(str(left_overs))
+    f.close()
     return cmp_list
 
 
