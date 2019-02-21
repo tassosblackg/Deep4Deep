@@ -316,11 +316,14 @@ class CNN(object):
 
         return valid_loss
 
-    def train(self, sess):
+    def train(self, sess,iter):
         start_time = time.clock()
 
-        n_early_stop_epochs = 12  # Define it
-        n_epochs = 20  # Define it
+        n_early_stop_epochs = 16  # Define it
+        n_epochs = 40  # Define it
+
+        # restore variables from previous train session
+        if(iter>0): restore_variables(sess)
 
         saver = tf.train.Saver(var_list = tf.trainable_variables(), max_to_keep = 4)
 

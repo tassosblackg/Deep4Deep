@@ -4,13 +4,20 @@ import tensorflow as tf
 from model import CNN
 from lib.model_io import get_model_id
 
+# change this according to your path
+path_to_train_set = "/home/tassos/Desktop/DATA_ASR/ASVspoof2017_V2_train_fbank"
+
 model_id = get_model_id()
 
 n_files=150 # how many files will read
+
+# cheat count files number
+total_inp_files = len(os.listdir(path_to_train_set))
+
 # Create the network
 network = CNN(model_id)
 
-for i in range():
+for i in range(total_inp_files):
 # loop until all data are read
     network.input(n_files)
 
@@ -24,7 +31,7 @@ for i in range():
         # Train the network
         sess = tf.Session(config=tf.ConfigProto(log_device_placement=True)) #session with log about gpu exec
         try:
-            network.train(sess)
+            network.train(sess,i)
             # save train
             # save()
         except KeyboardInterrupt:
