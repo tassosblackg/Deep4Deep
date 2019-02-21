@@ -21,7 +21,7 @@ network = CNN(model_id)
 
 for i in range(total_inp_files):
 # loop until all data are read
-    network.input(n_files)
+    network.input(n_tfiles,n_vfiles)
 
     with tf.device("/gpu0:"):
         # restore()

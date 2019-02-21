@@ -110,14 +110,14 @@ class CNN(object):
         return normX
 
     # read input data
-    def input(self,n_files):
-        self.Xtrain_in, self.Ytrain_in, self.train_size = rim.read_Data("ASVspoof2017_V2_train_fbank", "train_info.txt",n_files)  # Read Train data
+    def input(self,n_tfiles,n_vfiles):
+        self.Xtrain_in, self.Ytrain_in, self.train_size = rim.read_Data("ASVspoof2017_V2_train_fbank", "train_info.txt",n_tfiles)  # Read Train data
         # print(self.Xtrain_in)
         # Normalize input train set data
         self.Xtrain_in = self.normalize(self.Xtrain_in)
         print(self.Ytrain_in)
         print("shape"+str(self.Ytrain_in.shape))
-        self.Xvalid_in, self.Yvalid_in, self.dev_size = rim.read_Data("ASVspoof2017_V2_train_dev", "dev_info.txt",n_files)         # Read validation data
+        self.Xvalid_in, self.Yvalid_in, self.dev_size = rim.read_Data("ASVspoof2017_V2_train_dev", "dev_info.txt",n_vfiles)         # Read validation data
         # Normalize input validation set data
         self.Xvalid_in = self.normalize(self.Xvalid_in)
         print(self.Yvalid_in)
