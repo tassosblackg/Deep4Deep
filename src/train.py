@@ -6,10 +6,12 @@ from lib.model_io import get_model_id
 
 # change this according to your path
 path_to_train_set = "/home/tassos/Desktop/DATA_ASR/ASVspoof2017_V2_train_fbank"
+path_to_valid_set = "/home/tassos/Desktop/DATA_ASR/ASVspoof2017_V2_train_dev"
 
 model_id = get_model_id()
 
-n_files=150 # how many files will read
+n_tfiles=150 # how many train files will read
+n_vfiles=round(0,567*n_tfiles)
 
 # cheat count files number
 total_inp_files = len(os.listdir(path_to_train_set))
