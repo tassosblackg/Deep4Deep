@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 # very IMPORTANT to define the path ,dir_n
 # check your project directories
 
-path = "../../protocol_V2"               # check and define it properly
+path = "../protocol_V2"               # check and define it properly
 dir_n="/home/tassos/Desktop/DATA_ASR" # check and define where is your DATA dir
 
 # read if .wav file is genuine or spoof --create label
@@ -37,8 +37,9 @@ def read_cmp_dir(folder_name,n_files):
     files = g.glob(dir_n+"/"+folder_name + "/*.cmp")
     total_files = len(files)
     cmp_list = []
-    if os.path.exists("read_status.txt"):
-        f = open("read_status.txt","r")
+    read_status_file= folder_name+'_status.txt' # file's name
+    if os.path.exists(read_status_file):
+        f = open(read_status_file,"r")
         left_overs = int(f.readline())
         f.close()
     else:
@@ -53,17 +54,17 @@ def read_cmp_dir(folder_name,n_files):
         end_i = start_i+n_files     # ending point
         left_overs=left_overs-n_files
 
-    while (start_i<end_i):
+    while (start_i<end_i): # check this??
         cmp_list.append(read_cmp_file(files[start_i]))
         start_i+=1
     if (left_overs != 0):
         # write left_overs in file for next session
-        f = open("read_status.txt","w")
+        f = open(read_status_file,"w")
         f.write(str(left_overs))
         f.close()
-    else:
-        os.remove("read_status.txt")
-        
+    # else:
+    #     os.remove(read_status_file)
+
     return cmp_list
 
 
