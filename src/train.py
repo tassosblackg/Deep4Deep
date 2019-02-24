@@ -11,7 +11,7 @@ path_to_valid_set = "/home/tassos/Desktop/DATA_ASR/ASVspoof2017_V2_train_dev"
 
 model_id = get_model_id()
 
-n_tfiles=150 # how many train files will read
+n_tfiles=350 # how many train files will read
 n_vfiles=round(0.567*n_tfiles)
 print("a= \n")
 print(n_vfiles)
@@ -45,4 +45,7 @@ for i in range(1,total_inp_files,n_tfiles):
 
         finally:
             sess.close()
-            os.remove("read_status.txt")
+
+# train finished -remove files
+os.remove(os.path.basename(path_to_train_set)+"_status.txt")
+os.remove(os.path.basename(path_to_valid_set)+"_status.txt")

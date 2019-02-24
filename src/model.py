@@ -16,6 +16,7 @@ import math
 import tensorflow as tf
 import numpy as np
 from lib.model_io import save_variables
+from lib.model_io import restore_variables
 from lib.precision import _FLOATX
 import read_img as rim
 # ------define architecture functions--------------------------------------------------------------
@@ -146,86 +147,86 @@ class CNN(object):
 
     # build architecture
     def inference(self, X, keep_prob,reuse=True,is_training=True):
-        graph=tf.Graph()
-        with graph.as_default():
-            with tf.variable_scope("inference", reuse=reuse):
-                # Implement your network here
-                # equation or predefiend fuctions --convolution operation
-                # we define set of layers according to the max_pooling ksize
-                # each set has more than one convolution and max_poolin layers
-                # totaly we have 2 sets and 5 blocks
-                # init phase
-                # [filter_h,filter_w,in_channel,out_channel]
-                shape1 = [3, 3, 1, 1]
-                w = weight_dict(shape1)
-                b = bias_dict([shape1[3]])  # out_channel== n_hidden
-                conv1 = conv2d(X, w) + b    # init_convolution
+        # graph=tf.Graph()
+        # with graph.as_default():
+        with tf.variable_scope("inference", reuse=reuse):
+            # Implement your network here
+            # equation or predefiend fuctions --convolution operation
+            # we define set of layers according to the max_pooling ksize
+            # each set has more than one convolution and max_poolin layers
+            # totaly we have 2 sets and 5 blocks
+            # init phase
+            # [filter_h,filter_w,in_channel,out_channel]
+            shape1 = [3, 3, 1, 1]
+            w = weight_dict(shape1)
+            b = bias_dict([shape1[3]])  # out_channel== n_hidden
+            conv1 = conv2d(X, w) + b    # init_convolution
 
-        # -----------1st set--------{2 blocks}---------------------------------------
-                with tf.variable_scope("Set-1"):
-                    # -------1st block
-                    with tf.variable_scope("Block-1.1"):
-                        conv_l1 = conv_layer(conv1, [3, 3, 1, 4])
-                        batch_norm1 = batch_n(conv_l1)  # batch normalization
-                        conv_l2 = conv_layer(batch_norm1, [3, 3, 4, 4])
-                        batch_norm2 = batch_n(conv_l2)           # batch normalization
+    # -----------1st set--------{2 blocks}---------------------------------------
+            with tf.variable_scope("Set-1"):
+                # -------1st block
+                with tf.variable_scope("Block-1.1"):
+                    conv_l1 = conv_layer(conv1, [3, 3, 1, 4])
+                    batch_norm1 = batch_n(conv_l1)  # batch normalization
+                    conv_l2 = conv_layer(batch_norm1, [3, 3, 4, 4])
+                    batch_norm2 = batch_n(conv_l2)           # batch normalization
 
-                        mpool_1 = max_pool(batch_norm2, 1, 1)   # stride =1 , k=1
-                    # ------2nd block
-                    with tf.variable_scope("Block-1.2"):
-                        conv_l3 = conv_layer(mpool_1, [3, 3, 4, 8])
-                        batch_norm3 = batch_n(conv_l3)  # batch normalization
-                        conv_l4 = conv_layer(batch_norm3, [3, 3, 8, 8])
-                        batch_norm4 = batch_n(conv_l4)  # batch normalization
+                    mpool_1 = max_pool(batch_norm2, 1, 1)   # stride =1 , k=1
+                # ------2nd block
+                with tf.variable_scope("Block-1.2"):
+                    conv_l3 = conv_layer(mpool_1, [3, 3, 4, 8])
+                    batch_norm3 = batch_n(conv_l3)  # batch normalization
+                    conv_l4 = conv_layer(batch_norm3, [3, 3, 8, 8])
+                    batch_norm4 = batch_n(conv_l4)  # batch normalization
 
-                        mpool_2 = max_pool(batch_norm4, 1, 1)   # stride =1 , k=1
+                    mpool_2 = max_pool(batch_norm4, 1, 1)   # stride =1 , k=1
 
-                    #dropout layer
-                    with tf.variable_scope("Dropout-1"):
-                        mpool_2=tf.nn.dropout(l,keep_prob=keep_prob)
+                #dropout layer
+                with tf.variable_scope("Dropout-1"):
+                    mpool_2=tf.nn.dropout(mpool_2,keep_prob=keep_prob)
 
-        # --------2nd set------{3 blocks}--------------------------------------------
-                with tf.variable_scope("Set-2"):
-                    # -------3d block
-                    with tf.variable_scope("Block-2.1"):
-                        conv_l5 = conv_layer(mpool_2, [3, 3, 8, 16])
-                        batch_norm5 = batch_n(conv_l5)      # normalization
-                        conv_l6 = conv_layer(batch_norm5, [3, 3, 16, 16])
-                        batch_norm6 = batch_n(conv_l6)      # normalization batch
+    # --------2nd set------{3 blocks}--------------------------------------------
+            with tf.variable_scope("Set-2"):
+                # -------3d block
+                with tf.variable_scope("Block-2.1"):
+                    conv_l5 = conv_layer(mpool_2, [3, 3, 8, 16])
+                    batch_norm5 = batch_n(conv_l5)      # normalization
+                    conv_l6 = conv_layer(batch_norm5, [3, 3, 16, 16])
+                    batch_norm6 = batch_n(conv_l6)      # normalization batch
 
-                        mpool_3 = max_pool(batch_norm6, 1, 1)   # stride =1 , k=1
-                    # --------4th block
-                    with tf.variable_scope("Block-2.2"):
-                        conv_l7 = conv_layer(mpool_3, [3, 3, 16, 32])
-                        batch_norm7 = batch_n(conv_l7)
-                        conv_l8 = conv_layer(batch_norm7, [3, 3, 32, 32])
-                        batch_norm8 = batch_n(conv_l8)
+                    mpool_3 = max_pool(batch_norm6, 1, 1)   # stride =1 , k=1
+                # --------4th block
+                with tf.variable_scope("Block-2.2"):
+                    conv_l7 = conv_layer(mpool_3, [3, 3, 16, 32])
+                    batch_norm7 = batch_n(conv_l7)
+                    conv_l8 = conv_layer(batch_norm7, [3, 3, 32, 32])
+                    batch_norm8 = batch_n(conv_l8)
 
-                        mpool_4 = max_pool(batch_norm8, 2, 2)   # stride=2, k=2
-                    # --------5th blocks
-                    with tf.variable_scope("Block-2.3"):
-                        conv_l9 = conv_layer(mpool_4, [3, 3, 32, 64])
-                        batch_norm9 = batch_n(conv_l9)
-                        conv_l10 = conv_layer(batch_norm9, [3, 3, 64, 64])
-                        batch_norm10 = batch_n(conv_l10)
+                    mpool_4 = max_pool(batch_norm8, 2, 2)   # stride=2, k=2
+                # --------5th blocks
+                with tf.variable_scope("Block-2.3"):
+                    conv_l9 = conv_layer(mpool_4, [3, 3, 32, 64])
+                    batch_norm9 = batch_n(conv_l9)
+                    conv_l10 = conv_layer(batch_norm9, [3, 3, 64, 64])
+                    batch_norm10 = batch_n(conv_l10)
 
-                        mpool_5 = max_pool(batch_norm10, 2, 2)      # stride=2, k=2
-                        # print("SHAPE../n")
-                        # print(mpool_5.shape)
-                        # print(mpool_5.shape[1].value)
+                    mpool_5 = max_pool(batch_norm10, 2, 2)      # stride=2, k=2
+                    # print("SHAPE../n")
+                    # print(mpool_5.shape)
+                    # print(mpool_5.shape[1].value)
 
-        # ------------add dense layers {4 layers}-------------------------------------
-                with tf.variable_scope("Dense Layer"):
-                    flatt_out=flatten_l(mpool_5)        # flatten out tensor from 4D to 2D
-                    l=fully_con(flatt_out,256)          # 1st dense-relu layer
-                    l=fully_con(l,512)                  # 2nd
+    # ------------add dense layers {4 layers}-------------------------------------
+            with tf.variable_scope("Dense-Layer"):
+                flatt_out=flatten_l(mpool_5)        # flatten out tensor from 4D to 2D
+                l=fully_con(flatt_out,256)          # 1st dense-relu layer
+                l=fully_con(l,512)                  # 2nd
 
 
-                    logits=outp_layer(l,self.n_classes) # propability decision between two classes (Genuine or Spoofed)
-                    # print("$$")
-                    # print(logits.shape)
-        writer=tf.summary.FileWriter("model-graph",graph='graph')
-        writer.close()
+                logits=outp_layer(l,self.n_classes) # propability decision between two classes (Genuine or Spoofed)
+                # print("$$")
+                # print(logits.shape)
+        # writer=tf.summary.FileWriter("model-graph",graph='graph')
+        # writer.close()
         return logits
 
     def define_train_operations(self):
@@ -319,8 +320,8 @@ class CNN(object):
     def train(self, sess,iter):
         start_time = time.clock()
 
-        n_early_stop_epochs = 16  # Define it
-        n_epochs = 40  # Define it
+        n_early_stop_epochs = 25  # Define it
+        n_epochs = 60  # Define it
 
         # restore variables from previous train session
         if(iter>0): restore_variables(sess)

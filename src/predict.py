@@ -5,6 +5,8 @@ from lib.model_io import get_model_id
 from lib.model_io import restore_variables
 import read_img as rim
 
+path_to_eval_set = ""
+
 model_id = get_model_id()
 
 n_files=150
