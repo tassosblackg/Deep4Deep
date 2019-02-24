@@ -47,5 +47,8 @@ for i in range(1,total_inp_files,n_tfiles):
             sess.close()
 
 # train finished -remove files
-os.remove(os.path.basename(path_to_train_set)+"_status.txt")
-os.remove(os.path.basename(path_to_valid_set)+"_status.txt")
+
+file1 = os.path.basename(path_to_train_set)+"_status.txt"
+if(os.path.exists(file1)): os.remove(file1)
+file2 = os.path.basename(path_to_valid_set)+"_status.txt"
+if(os.path.exists(file2)): os.remove(file2)

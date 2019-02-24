@@ -62,8 +62,8 @@ def read_cmp_dir(folder_name,n_files):
         f = open(read_status_file,"w")
         f.write(str(left_overs))
         f.close()
-    # else:
-    #     os.remove(read_status_file)
+    else:
+        os.remove(read_status_file)
 
     return cmp_list
 
