@@ -1,6 +1,6 @@
 #test reading .cmp files
 import imp
-imp.load_source("read_img","/home/tassos/Desktop/Deep4Deep/src/read_img.py")
+imp.load_source("read_img","/home/tassos/Desktop/SpeechR2/Deep4Deep/src/read_img.py")
 import numpy as np
 import matplotlib.pyplot as plt
 import read_img as rim
@@ -15,4 +15,4 @@ import read_img as rim
 #print(cl_types)
 
 #check read data
-Xdata,Υdata,nframes=rim.read_Data("ASVspoof2017_V2_train_fbank","train_info.txt" )
+Xdata,Υdata,nframes=rim.read_Data("ASVspoof2017_V2_train_fbank","train_info.txt",700)

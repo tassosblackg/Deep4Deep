@@ -5,13 +5,16 @@ from lib.model_io import get_model_id
 from lib.model_io import restore_variables
 import read_img as rim
 
+path_to_eval_set = ""
+
 model_id = get_model_id()
 
+n_files=150
 
 # Create the network
 network = CNN(model_id)
 #read DATA
-Xeval,Yeval,network.eval_size= rim.read_Data("ASVspoof2017_V2_train_eval","eval_info.txt")
+Xeval,Yeval,network.eval_size= rim.read_Data("ASVspoof2017_V2_train_eval","eval_info.txt",n_files)
 
 Xeval=network.normalize(Xeval)  #Normalize eval data
 # print(network.eval_size/network.batch_size)

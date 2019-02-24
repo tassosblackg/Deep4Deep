@@ -16,6 +16,7 @@ import math
 import tensorflow as tf
 import numpy as np
 from lib.model_io import save_variables
+from lib.model_io import restore_variables
 from lib.precision import _FLOATX
 import read_img as rim
 # ------define architecture functions--------------------------------------------------------------
@@ -80,6 +81,8 @@ def batch_n(convl):
 # -------------------------------------------------------------------------------------------------------
 
 
+# CNN model class
+
 class CNN(object):
 
     def __init__(self, model_id=None):
@@ -96,9 +99,9 @@ class CNN(object):
         self.n_classes = 2      # genuine or spoof --number of classes
         self.batch_size = 256   # 64 || 128 || 256
 
-        self.train_size = 0  # 1587420  # number of frames (train)
-        self.dev_size = 0  # 1029721  # number of frames (valid)
-        self.eval_size = 0  # 8522944 #number of frames (eval)
+        self.train_size = 0     # 1587420  # number of frames (train)
+        self.dev_size = 0       # 1029721  # number of frames (valid)
+        self.eval_size = 0      # 8522944 #number of frames (eval)
 
     # normalize input data
     def normalize(self, X):
@@ -106,21 +109,21 @@ class CNN(object):
         col_min = np.min(X, axis=0)
         normX = np.divide(X - col_min, col_max - col_min)
         return normX
+
     # read input data
-    def input(self):
-        self.Xtrain_in, self.Ytrain_in, self.train_size = rim.read_Data(
-            "ASVspoof2017_V2_train_fbank", "train_info.txt")  # Read Train data
+    def input(self,n_tfiles,n_vfiles):
+        self.Xtrain_in, self.Ytrain_in, self.train_size = rim.read_Data("ASVspoof2017_V2_train_fbank", "train_info.txt",n_tfiles)  # Read Train data
         # print(self.Xtrain_in)
         # Normalize input train set data
         self.Xtrain_in = self.normalize(self.Xtrain_in)
         print(self.Ytrain_in)
         print("shape"+str(self.Ytrain_in.shape))
-        self.Xvalid_in, self.Yvalid_in, self.dev_size = rim.read_Data(
-            "ASVspoof2017_V2_train_dev", "dev_info.txt")  # Read validation data
+        self.Xvalid_in, self.Yvalid_in, self.dev_size = rim.read_Data("ASVspoof2017_V2_train_dev", "dev_info.txt",n_vfiles)         # Read validation data
         # Normalize input validation set data
         self.Xvalid_in = self.normalize(self.Xvalid_in)
         print(self.Yvalid_in)
         print("shape"+str(self.Yvalid_in.shape))
+
     # shuffle index so to get with random order the data
     def shuffling(self, X,Y):
         indx=np.arange(len(X))      #create a array with indexes for X data
@@ -130,7 +133,8 @@ class CNN(object):
         # print("shuffle")
         # print(Y.shape)
         return X,Y
-    #take X batch and Ybatch
+
+    # take X batch and Ybatch
     def read_nxt_batch(self,X,Y,batch_s,indx=0):
         if(indx+batch_s <len(X)):     # check and be sure that you're in range
             # print(Y.shape)
@@ -141,7 +145,10 @@ class CNN(object):
         else:
             return None,None,None
 
+    # build architecture
     def inference(self, X, keep_prob,reuse=True,is_training=True):
+        # graph=tf.Graph()
+        # with graph.as_default():
         with tf.variable_scope("inference", reuse=reuse):
             # Implement your network here
             # equation or predefiend fuctions --convolution operation
@@ -156,74 +163,82 @@ class CNN(object):
             conv1 = conv2d(X, w) + b    # init_convolution
 
     # -----------1st set--------{2 blocks}---------------------------------------
-            # -------1st block
-            conv_l1 = conv_layer(conv1, [3, 3, 1, 4])
-            batch_norm1 = batch_n(conv_l1)  # batch normalization
-            conv_l2 = conv_layer(batch_norm1, [3, 3, 4, 4])
-            batch_norm2 = batch_n(conv_l2)           # batch normalization
+            with tf.variable_scope("Set-1"):
+                # -------1st block
+                with tf.variable_scope("Block-1.1"):
+                    conv_l1 = conv_layer(conv1, [3, 3, 1, 4])
+                    batch_norm1 = batch_n(conv_l1)  # batch normalization
+                    conv_l2 = conv_layer(batch_norm1, [3, 3, 4, 4])
+                    batch_norm2 = batch_n(conv_l2)           # batch normalization
 
-            mpool_1 = max_pool(batch_norm2, 1, 1)   # stride =1 , k=1
-            # ------2nd block
-            conv_l3 = conv_layer(mpool_1, [3, 3, 4, 8])
-            batch_norm3 = batch_n(conv_l3)  # batch normalization
-            conv_l4 = conv_layer(batch_norm3, [3, 3, 8, 8])
-            batch_norm4 = batch_n(conv_l4)  # batch normalization
+                    mpool_1 = max_pool(batch_norm2, 1, 1)   # stride =1 , k=1
+                # ------2nd block
+                with tf.variable_scope("Block-1.2"):
+                    conv_l3 = conv_layer(mpool_1, [3, 3, 4, 8])
+                    batch_norm3 = batch_n(conv_l3)  # batch normalization
+                    conv_l4 = conv_layer(batch_norm3, [3, 3, 8, 8])
+                    batch_norm4 = batch_n(conv_l4)  # batch normalization
 
-            mpool_2 = max_pool(batch_norm4, 1, 1)   # stride =1 , k=1
+                    mpool_2 = max_pool(batch_norm4, 1, 1)   # stride =1 , k=1
 
-            #dropout layer
-            mpool_2=tf.nn.dropout(l,keep_prob=keep_prob)
+                #dropout layer
+                with tf.variable_scope("Dropout-1"):
+                    mpool_2=tf.nn.dropout(mpool_2,keep_prob=keep_prob)
 
     # --------2nd set------{3 blocks}--------------------------------------------
-            # -------3d block
-            conv_l5 = conv_layer(mpool_2, [3, 3, 8, 16])
-            batch_norm5 = batch_n(conv_l5)      # normalization
-            conv_l6 = conv_layer(batch_norm5, [3, 3, 16, 16])
-            batch_norm6 = batch_n(conv_l6)      # normalization batch
+            with tf.variable_scope("Set-2"):
+                # -------3d block
+                with tf.variable_scope("Block-2.1"):
+                    conv_l5 = conv_layer(mpool_2, [3, 3, 8, 16])
+                    batch_norm5 = batch_n(conv_l5)      # normalization
+                    conv_l6 = conv_layer(batch_norm5, [3, 3, 16, 16])
+                    batch_norm6 = batch_n(conv_l6)      # normalization batch
 
-            mpool_3 = max_pool(batch_norm6, 1, 1)   # stride =1 , k=1
-            # --------4th block
-            conv_l7 = conv_layer(mpool_3, [3, 3, 16, 32])
-            batch_norm7 = batch_n(conv_l7)
-            conv_l8 = conv_layer(batch_norm7, [3, 3, 32, 32])
-            batch_norm8 = batch_n(conv_l8)
+                    mpool_3 = max_pool(batch_norm6, 1, 1)   # stride =1 , k=1
+                # --------4th block
+                with tf.variable_scope("Block-2.2"):
+                    conv_l7 = conv_layer(mpool_3, [3, 3, 16, 32])
+                    batch_norm7 = batch_n(conv_l7)
+                    conv_l8 = conv_layer(batch_norm7, [3, 3, 32, 32])
+                    batch_norm8 = batch_n(conv_l8)
 
-            mpool_4 = max_pool(batch_norm8, 2, 2)   # stride=2, k=2
-            # --------5th blocks
+                    mpool_4 = max_pool(batch_norm8, 2, 2)   # stride=2, k=2
+                # --------5th blocks
+                with tf.variable_scope("Block-2.3"):
+                    conv_l9 = conv_layer(mpool_4, [3, 3, 32, 64])
+                    batch_norm9 = batch_n(conv_l9)
+                    conv_l10 = conv_layer(batch_norm9, [3, 3, 64, 64])
+                    batch_norm10 = batch_n(conv_l10)
 
-            conv_l9 = conv_layer(mpool_4, [3, 3, 32, 64])
-            batch_norm9 = batch_n(conv_l9)
-            conv_l10 = conv_layer(batch_norm9, [3, 3, 64, 64])
-            batch_norm10 = batch_n(conv_l10)
-
-            mpool_5 = max_pool(batch_norm10, 2, 2)      # stride=2, k=2
-            # print("SHAPE../n")
-            # print(mpool_5.shape)
-            # print(mpool_5.shape[1].value)
+                    mpool_5 = max_pool(batch_norm10, 2, 2)      # stride=2, k=2
+                    # print("SHAPE../n")
+                    # print(mpool_5.shape)
+                    # print(mpool_5.shape[1].value)
 
     # ------------add dense layers {4 layers}-------------------------------------
+            with tf.variable_scope("Dense-Layer"):
+                flatt_out=flatten_l(mpool_5)        # flatten out tensor from 4D to 2D
+                l=fully_con(flatt_out,256)          # 1st dense-relu layer
+                l=fully_con(l,512)                  # 2nd
 
-            flatt_out=flatten_l(mpool_5)        #flatten out tensor from 4D to 2D
-            l=fully_con(flatt_out,256)           #1st dense-relu layer
-            l=fully_con(l,512)                 #2nd
 
-
-            logits=outp_layer(l,self.n_classes) #propability decision between two classes (Genuine or Spoofed)
-            # print("$$")
-            # print(logits.shape)
+                logits=outp_layer(l,self.n_classes) # propability decision between two classes (Genuine or Spoofed)
+                # print("$$")
+                # print(logits.shape)
+        # writer=tf.summary.FileWriter("model-graph",graph='graph')
+        # writer.close()
         return logits
 
     def define_train_operations(self):
 
-        self.keep_prob=tf.placeholder(tf.float32,name='keep_prob')       #placeholder for keeping dropout probality
+        self.keep_prob    = tf.placeholder(tf.float32,name='keep_prob')       # placeholder for keeping dropout probality
 
         self.X_data_train = tf.placeholder(dtype=tf.float32, shape=(None, self.height,self.width,self.chan),name='X_data_train')  # Define this
 
         self.Y_data_train = tf.placeholder(dtype=tf.int32, shape=(None, ),name='Y_data_train')  # Define this
 
         # Network prediction
-        Y_net_train = self.inference(
-            self.X_data_train,self.keep_prob,reuse=False)
+        Y_net_train = self.inference(self.X_data_train,self.keep_prob,reuse=False)
 
         # Loss of train data tf.nn.softmax_cross_entropy_with_logits
         self.train_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.Y_data_train, logits=Y_net_train, name='train_loss'))
@@ -238,8 +253,7 @@ class CNN(object):
         optimizer = tf.train.AdamOptimizer(learning_rate)
 
         trainable = tf.trainable_variables()  # may be the weights??
-        self.update_ops = optimizer.minimize(
-            self.train_loss, var_list=trainable, global_step=global_step)
+        self.update_ops = optimizer.minimize(self.train_loss, var_list=trainable, global_step=global_step)
 
         # --- Validation computations
         self.X_data_valid = tf.placeholder(dtype=tf.float32, shape=(None, self.height, self.width, self.chan))  # Define this
@@ -252,7 +266,7 @@ class CNN(object):
         self.valid_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
             labels=self.Y_data_valid, logits=Y_net_valid, name='valid_loss'))
 
-    # def read_nxt_batch(self):
+
 
     def train_epoch(self, sess):
         print("Train_epoch")
@@ -303,11 +317,14 @@ class CNN(object):
 
         return valid_loss
 
-    def train(self, sess):
+    def train(self, sess,iter):
         start_time = time.clock()
 
-        n_early_stop_epochs = 12  # Define it
-        n_epochs = 20  # Define it
+        n_early_stop_epochs = 25  # Define it
+        n_epochs = 60  # Define it
+
+        # restore variables from previous train session
+        if(iter>0): restore_variables(sess)
 
         saver = tf.train.Saver(var_list = tf.trainable_variables(), max_to_keep = 4)
 
@@ -348,6 +365,7 @@ class CNN(object):
         end_time=time.clock()
         print('Total time = ' + str(end_time - start_time))
 
+    # functionality during evaluation task
     def define_predict_operations(self):
         self.X_data_test_placeholder=tf.placeholder(dtype=tf.float32, shape = (None, self.height,self.width,self.chan))  # ??
         self.keep_prob_placeholder=tf.placeholder(dtype=tf.float32,name='keep_prob')
