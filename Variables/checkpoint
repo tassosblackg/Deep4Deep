@@ -1,0 +1,4 @@
+model_checkpoint_path: "cnn-4"
+all_model_checkpoint_paths: "cnn-1"
+all_model_checkpoint_paths: "cnn-3"
+all_model_checkpoint_paths: "cnn-4"

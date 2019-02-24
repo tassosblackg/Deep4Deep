@@ -13,8 +13,8 @@ model_id = get_model_id()
 
 n_tfiles=350 # how many train files will read
 n_vfiles=round(0.567*n_tfiles)
-print("a= \n")
-print(n_vfiles)
+# print("a= \n")
+# print(n_vfiles)
 # cheat count files number
 total_inp_files = len(os.listdir(path_to_train_set))
 
@@ -34,9 +34,10 @@ for i in range(1,total_inp_files,n_tfiles):
 
 
         # Train the network
-        sess = tf.Session(config=tf.ConfigProto(log_device_placement=True,allow_soft_placement = True)) #session with log about gpu exec
+        sess = tf.Session(config=tf.ConfigProto(allow_soft_placement = True)) # session with log about gpu exec 
         #sess= tf.Session()
         try:
+            print(iter)
             network.train(sess,iter)
             iter+=1
             # save()

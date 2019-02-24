@@ -320,9 +320,11 @@ class CNN(object):
     def train(self, sess,iter):
         start_time = time.clock()
 
-        n_early_stop_epochs = 25  # Define it
-        n_epochs = 60  # Define it
+        n_early_stop_epochs = 15  # Define it
+        n_epochs = 30  # Define it
 
+        print("!=\n")
+        print(iter)
         # restore variables from previous train session
         if(iter>0): restore_variables(sess)
 
