@@ -204,9 +204,21 @@ def read_stage2(data,labels,total_nframes):
 def read_Data(dir_name, info_file,n_files):
     class_types= read_subset_labels(info_file,n_files)              # read encoded-labels from a file 1st step
     ohe_l = one_hot_encode(class_types)                             # one -hot encode labels -2d step
-    data,labels_l,tframes=read_stage1(dir_name,ohe_l,n_files)       # keep a subset of data in memory-3nd step
-
-    return(read_stage2(data,labels_l,tframes))
+    data,labels_l,tframes = read_stage1(dir_name,ohe_l,n_files)       # keep a subset of data in memory-3nd step
+    np_data,np_labels,total_frames = read_stage2(data,labels_l,tframes)
+    print("SHAPE= ")
+    print(np_data.shape)
+    # print('\ntransposed shape= ')
+    # print((np_data.T).shape)
+    print('\nlabels_shape= ')
+    print(np_labels.shape)
+    # reshaped_data = np_data.T
+    in_nodes_dim = np_data.shape[1]*np_data.shape[2]*np_data.shape[3] # 64x17x1
+    reshaped_data = np_data.reshape(tframes,in_nodes_dim) # reshape data to ndarray shape=(n_total_frames,in_nodes_dim)
+    print('\nreshaped= ')
+    print(reshaped_data.shape)
+    # read_stage2(data,labels_l,tframes)
+    return(10,100,1)
 
 
 
