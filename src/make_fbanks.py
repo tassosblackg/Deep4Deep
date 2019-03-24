@@ -1,4 +1,6 @@
 # run by passin as argument train,eval or dev and the path to the dataset folder
+# this script reads sound files and extract features
+# is a mfcc like technique except the dct step -- facebook reseacher exmple check
 
 from __future__ import print_function
 
