@@ -74,13 +74,14 @@ def normalize( X):
 
 # read input data
 def input(network,n_tfiles,n_vfiles):
+    # Xtrain_in,Ytrain_in : list of ndarray
     network.Xtrain_in, network.Ytrain_in, network.train_size = rim.read_Data("ASVspoof2017_V2_train_fbank", "train_info.txt",n_tfiles)  # Read Train data
     # Normalize input train set data
     network.Xtrain_in = normalize(network.Xtrain_in)
-    # # read valiation data
-    # network.Xvalid_in, network.Yvalid_in, network.dev_size = rim.read_Data("ASVspoof2017_V2_train_dev", "dev_info.txt",n_vfiles)         # Read validation data
+    # read valiation data
+    network.Xvalid_in, network.Yvalid_in, network.dev_size = rim.read_Data("ASVspoof2017_V2_train_dev", "dev_info.txt",n_vfiles)         # Read validation data
     # # Normalize input validation set data
-    # network.Xvalid_in = normalize(network.Xvalid_in)
+    network.Xvalid_in = normalize(network.Xvalid_in)
 
 
 # shuffle index so to get with random order the data

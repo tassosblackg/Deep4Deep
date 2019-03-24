@@ -35,53 +35,53 @@ def read_subset_labels(file_name,n_files):
     labels_list = read_label(file_name) # file name of where labels are saved
     total_files = len(labels_list)
     subset_labels = []
-    start_i,end_i = read_status_upd(n_files,total_files,upd=0)
+    start_i,end_i = read_status_upd('labels',n_files,total_files)
     while (start_i<end_i): # read n append a subset of input data [start_i,end_i]
         subset_labels.append(labels_list[start_i]) # take one record
         start_i += 1
-    start_i,end_i = read_status_upd(n_files,total_files,upd=1)
+
     del(labels_list)    # free up space
+
     return subset_labels
 
 # create one hot encoding labels
 def one_hot_encode(labels):
     n_labels = len(labels) # how many labels per input data
-    n_unique_labels = len(np.unique(labels)) # how many classes -- aka different labels
+    # n_unique_labels = len(np.unique(labels)) # how many classes -- aka different labels
+    n_unique_labels = 2
     print(n_labels,n_unique_labels)
     ohe = np.zeros((n_labels,n_unique_labels))
     ohe[np.arange(n_labels),labels] = 1
     return ohe
 
-def read_status_upd(n_files,total_files,upd=0):
-    if(upd==0):
-        read_status_file= folder_name+'_status.txt' # status file's name
-        if os.path.exists(read_status_file):
-            f = open(read_status_file,"r")
-            left_overs = int(f.readline())
-            f.close()
-        else:
-            left_overs = total_files    # first read attempt, no files have been read
+def read_status_upd(file_name,n_files,total_files):
 
+    read_status_file= file_name+'_status.txt' # status file's name
+    if os.path.exists(read_status_file):
+        f = open(read_status_file,"r")
+        left_overs = int(f.readline())
+        f.close()
+    else:
+        left_overs = total_files    # first read attempt, no files have been read
 
-        start_i = total_files-left_overs # starting point of loop
-        if (left_overs<n_files) :
-            end_i = start_i + left_overs
-            left_overs = 0
-        else:                           #
-            end_i = start_i+n_files     # ending point
-            left_overs=left_overs-n_files
+    # calculate start - end index to read
+    start_i = total_files-left_overs # starting point of loop
+    if (left_overs<n_files) :
+        end_i = start_i + left_overs
+        left_overs = 0
+    else:                           #
+        end_i = start_i+n_files     # ending point
+        left_overs=left_overs-n_files
+    # save inforamtion of leftovers
+    if (left_overs != 0):
+        # write left_overs in file for next session
+        f = open(read_status_file,"w")
+        f.write(str(left_overs))
+        f.close()
+    else:
+        os.remove(read_status_file)
 
-        return start_i,end_i
-
-    elif(upd==1):
-        if (left_overs != 0):
-            # write left_overs in file for next session
-            f = open(read_status_file,"w")
-            f.write(str(left_overs))
-            f.close()
-        else:
-            os.remove(read_status_file)
-        return None,None
+    return start_i,end_i
 
 # read  n_files .cmp files from a directory and create an array of them
 # plus from a list of labels return a subset according the n_files
@@ -89,12 +89,10 @@ def read_cmp_dir(folder_name,class_types,n_files):
     files = g.glob(dir_n+"/"+folder_name + "/*.cmp")
     total_files = len(files)
     cmp_list = []
-    start_i,end_i = read_status_upd(n_files,total_files,upd=0) # set start and end poind of reading
+    start_i,end_i = read_status_upd(folder_name,n_files,total_files) # set start and end poind of reading
     while (start_i<end_i): # read n append a subset of input data [start_i,end_i]
         cmp_list.append(read_cmp_file(files[start_i]))
-        # labels_list.append(class_types[start_i])
         start_i += 1
-    start_i,end_i = read_status_upd(n_files,total_files,upd=1)
 
     return cmp_list
 
@@ -152,12 +150,12 @@ def read_stage1(dir_name, class_types,n_files):
     print("enter loop 1..\n")
     print('Cmp_l = ',str(cmp_l.__len__())+'\n')
     # for each cmp file
-    for _ in range(cmp_l.__len__()):
+    for i in range(len(cmp_l)):
         # cmp_data = read_cmp_file(cmp_nl[i])       # read that file
         cmp2img = convert_to_images(cmp_l.pop(0))   # convert this file to image --returns a np array
         nframes=cmp2img.shape[0]                    # size of np array
         #print(cmp2img.shape)                       # (num of images,heigt,width,1)
-        labels_per_frames.extend([class_types.pop(0)]*nframes)  # instead to keep one label per cmp, keep for each frame of it
+        labels_per_frames.extend([class_types[i]]*nframes)  # instead to keep one label per cmp, keep for each frame of it
         total_nframes+=nframes                      # all images
         data_l.append(cmp2img)                      # keep all imgs -- a list with numpy array
     print("end of loop1..\n")
@@ -170,37 +168,28 @@ def read_stage1(dir_name, class_types,n_files):
 
 # create a final numpy array of data and labels
 # @data :  is a list with input data
-# @ohe_labels : is a numpy array one-hot encoded labels []
+# @labels : is a list with numpy array one-hot encoded labels []
 # @total_nframes : is the total number of frames accross all read .cmp files together
-def read_stage2(data,ohe_labels,total_nframes):
+def read_stage2(data,labels,total_nframes):
+
     dim=data[0].shape[1]    # 64
     width=data[0].shape[2]  # 17
-    print("dim= ",str(dim)+"\n")
-    print('width= ',str(width)+'\n')
-    print('l= ',str(data[0].shape[0])+'\n')
     # create all_params np array
-    all_imgs=np.zeros(shape=(total_nframes,dim,width,1),dtype=np.float32) # initialize np array -- all frames of a .cmp file
-    all_labels=np.zeros(shape=(total_nframes, ),dtype=np.int32)           # each .cmp file many frames repeat label for number of frames
+    all_imgs=np.zeros((total_nframes,dim,width,1),dtype=np.float32)         # initialize np array -- all frames of a .cmp file
+    all_labels=np.zeros(shape=(total_nframes, 2),dtype=np.int32)           # each .cmp file many frames repeat label for number of frames
     indx=0
-    # iterate through list objects(numpy elements)
+    #revert python lists to numpy array
     for l in range(len(data)):
-        cframes=data[0].shape[0]
-        print('cframes= ',str(cframes)+'\n')
-        all_imgs[indx:indx+cframes,:]=data.pop(0)
-    #     # print('data_pop= ',all_imgs[indx:indx+cframes,:])
-    #     # print('\n')
-        # all_labels[indx:indx+cframes]=ohe_labels[]
-    #     # print('data_l= ',all_labels[indx:indx+cframes])
-    #     # print('\n')
-    #     indx=indx+cframes
+        cframes = data[l].shape[0]  # number of frames per file
+        # print(cframes)
+        all_imgs[indx:indx+cframes,:,:,] = data[l]
+        all_labels[indx:indx+cframes,:] = labels[l:l+cframes]
+        indx +=cframes
 
     # free space
     del(data)
-    del(types)
-    # one-hot encode the labels
-    print("all_l= ",all_labels)
-    print("")
-    print('L=',str(len(all_labels)))
+    del(labels)
+    print('End read_stage 2\n')
 
     # save to file --run only once
     # np.save("Xdata",all_imgs)
@@ -215,11 +204,10 @@ def read_stage2(data,ohe_labels,total_nframes):
 def read_Data(dir_name, info_file,n_files):
     class_types= read_subset_labels(info_file,n_files)              # read encoded-labels from a file 1st step
     ohe_l = one_hot_encode(class_types)                             # one -hot encode labels -2d step
-    print("ohe_l= ",ohe_l.shape)
     data,labels_l,tframes=read_stage1(dir_name,ohe_l,n_files)       # keep a subset of data in memory-3nd step
 
     return(read_stage2(data,labels_l,tframes))
-    # return 10,100
+
 
 
 # ------------------------------------------------------------------------------

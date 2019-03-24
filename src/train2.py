@@ -18,7 +18,7 @@ try:
 
     model_id = get_model_id()
     # model_id = read_model_id
-    n_tfiles=1 # how many train files will read
+    n_tfiles=4 # how many train files will read
     n_vfiles=round(0.25*n_tfiles)
     # print("a= \n")
     # print(n_vfiles)
@@ -30,6 +30,7 @@ try:
     network = CNN(model_id)
     iter=0
     mf.input(network,n_tfiles,n_vfiles)
+    # print(network.Xtrain_in)
     # for i in range(1,total_inp_files,n_tfiles):
     # # loop until all data are read
     #
@@ -74,3 +75,4 @@ if (flag==1):
     if(os.path.exists(file1)): os.remove(file1)
     file2 = os.path.basename(path_to_valid_set)+"_status.txt"
     if(os.path.exists(file2)): os.remove(file2)
+    if(os.path.exists('labels_status.txt')):os.remove('labels_status.txt')
