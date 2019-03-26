@@ -2,8 +2,9 @@
 import tensorflow as tf
 import read_img as rim
 import numpy as np
-# ------define architecture functions--------------------------------------------------------------
-
+# -----------------------------------------------------------------------------------------------------------------
+#                                MODEL ARCHITECTURE FUNCTIONS
+# _________________________________________________________________________________________________________________
 # define weights
 def weight_dict(shape,name):
     init = tf.truncated_normal(shape, stddev=0.1)
@@ -15,18 +16,24 @@ def bias_dict(shape,name):
     return(tf.Variable(init,name=name))
 
 # return convolution result --optional add bias
-def conv2d(x, W, name,stride=1):
-    return(tf.nn.conv2d(x, W, strides=[1, stride, stride, 1], padding='SAME',name=name))
+def conv2d(x, W, b,name,strides=1):
+    x = tf.nn.conv2d(x, W, strides=[1, strides, strides, 1], padding='SAME',name=name))
+    x = tf.nn.bias_add(x,b)
+    return (x)
 
 # define convolution layer
-def conv_layer(inp, shape,name):
-    W = weight_dict(shape,(name+'_w'))
-    b = bias_dict([shape[3]],(name+'_b'))
-    # return(tf.nn.relu(conv2d(inp, W,name) + b))
-    return (conv2d(inp,W,name)+b)
+# def conv_layer(inp, shape,name):
+#     W = weight_dict(shape,(name+'_w'))
+#     b = bias_dict([shape[3]],(name+'_b'))
+#     # return(tf.nn.relu(conv2d(inp, W,name) + b))
+#     return (conv2d(inp,W,name)+b)
+
+# batch normalization
+def batch_n(convl,name):
+    return (tf.nn.relu(tf.contrib.layers.batch_norm(convl,scale=True)))
 
 # define max pooling function
-def max_pool(x, stride, k,name):
+def max_pool(x, strides, k,name):
     return (tf.nn.max_pool(x, strides=[1, 2, stride, 1], ksize=[1, 2, k, 1], padding='VALID',name=name))
 
 
@@ -59,11 +66,11 @@ def outp_layer(inp,n_outp,name):
     outp=dense_layer(inp,n_outp,name)
     return(tf.nn.softmax(outp))
 
-# batch normalization
-def batch_n(convl,name):
-    return (tf.nn.relu(tf.contrib.layers.batch_norm(convl,scale=True)))
-# -------------------------------------------------------------------------------------------------------
 
+
+# ------------------------------------------------------------------------------------------------------------
+#                                   INPUT DATA PROCESSING
+#_____________________________________________________________________________________________________________
 # DATA preprocessing operations
 # normalize input data
 def normalize( X):

@@ -217,8 +217,8 @@ def read_Data(dir_name, info_file,n_files):
     reshaped_data = np_data.reshape(tframes,in_nodes_dim) # reshape data to ndarray shape=(n_total_frames,in_nodes_dim)
     print('\nreshaped= ')
     print(reshaped_data.shape)
-    # read_stage2(data,labels_l,tframes)
-    return(10,100,1)
+    
+    return(reshaped_data,np_labels,total_frames)
 
 
 
