@@ -18,8 +18,8 @@ try:
 
     model_id = get_model_id()
     # model_id = read_model_id
-    n_tfiles=4 # how many train files will read
-    n_vfiles=round(0.25*n_tfiles)
+    n_tfiles=200 # how many train files will read per step
+    n_vfiles=round(0.25*n_tfiles) # number of  validation files to be read per iter
     # print("a= \n")
     # print(n_vfiles)
     # cheat count files number
@@ -29,35 +29,34 @@ try:
     # Create the network
     network = CNN(model_id)
     iter=0
-    mf.input(network,n_tfiles,n_vfiles)
+    # mf.input(network,n_tfiles,n_vfiles)
     # print(network.Xtrain_in)
-    # for i in range(1,total_inp_files,n_tfiles):
-    # # loop until all data are read
-    #
-    #     mf.input(network,n_tfiles,n_vfiles)
+    for i in range(1,total_inp_files,n_tfiles):
+    # loop until all data are read
 
-        # with tf.device('/gpu:0'):
-        #     # restore()
-        #     if(iter==0):
-        #         # Define the train computation graph
-        #         network.define_train_operations()
-        #
-        #
-        #     # Train the network
-        #     sess = tf.Session(config=tf.ConfigProto(allow_soft_placement = True)) # session with log about gpu exec
-        #     #sess= tf.Session()
-        #     try:
-        #         print(iter)
-        #         network.train(sess,iter)
-        #         iter += 1
-        #         flag = 0
-        #         # save()
-        #     except KeyboardInterrupt:
-        #         print()
-        #         flag = 1
-        #     finally:
-        #         flag = 1
-        #         sess.close()
+        mf.input(network,n_tfiles,n_vfiles)
+
+        with tf.device('/gpu:0'):
+            # restore()
+            if(iter==0):
+                # Define the train computation graph
+                network.define_train_operations()
+
+            # Train the network
+            sess = tf.Session(config=tf.ConfigProto(allow_soft_placement = True)) # session with log about gpu exec
+            #sess= tf.Session()
+            try:
+                print(iter)
+                network.train(sess,iter)
+                iter += 1
+                flag = 0
+                # save()
+            except KeyboardInterrupt:
+                print()
+                flag = 1
+            finally:
+                flag = 1
+                sess.close()
 except KeyboardInterrupt:
     flag=1
 except Exception as e:

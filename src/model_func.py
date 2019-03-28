@@ -17,16 +17,16 @@ def bias_dict(shape,name):
 
 # return convolution result --optional add bias
 def conv2d(x, W, b,name,strides=1):
-    x = tf.nn.conv2d(x, W, strides=[1, strides, strides, 1], padding='SAME',name=name))
+    x = tf.nn.conv2d(x, W, strides=[1, strides, strides, 1], padding='SAME',name=name)
     x = tf.nn.bias_add(x,b)
     return (x)
 
 # define convolution layer
-# def conv_layer(inp, shape,name):
-#     W = weight_dict(shape,(name+'_w'))
-#     b = bias_dict([shape[3]],(name+'_b'))
-#     # return(tf.nn.relu(conv2d(inp, W,name) + b))
-#     return (conv2d(inp,W,name)+b)
+def conv_layer(inp, shape,name):
+    W = weight_dict(shape,(name+'_w'))
+    b = bias_dict([shape[3]],(name+'_b'))
+    # return(tf.nn.relu(conv2d(inp, W,name) + b))
+    return (conv2d(inp,W,name)+b)
 
 # batch normalization
 def batch_n(convl,name):
@@ -34,7 +34,7 @@ def batch_n(convl,name):
 
 # define max pooling function
 def max_pool(x, strides, k,name):
-    return (tf.nn.max_pool(x, strides=[1, 2, stride, 1], ksize=[1, 2, k, 1], padding='VALID',name=name))
+    return (tf.nn.max_pool(x, strides=[1, 2, strides, 1], ksize=[1, 2, k, 1], padding='VALID',name=name))
 
 
 
