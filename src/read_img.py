@@ -35,7 +35,7 @@ def read_subset_labels(file_name,n_files):
     labels_list = read_label(file_name) # file name of where labels are saved
     total_files = len(labels_list)
     subset_labels = []
-    start_i,end_i = read_status_upd('labels',n_files,total_files)
+    start_i,end_i = read_status_upd(file_name+'labels',n_files,total_files)
     while (start_i<end_i): # read n append a subset of input data [start_i,end_i]
         subset_labels.append(labels_list[start_i]) # take one record
         start_i += 1
@@ -90,6 +90,8 @@ def read_cmp_dir(folder_name,class_types,n_files):
     total_files = len(files)
     cmp_list = []
     start_i,end_i = read_status_upd(folder_name,n_files,total_files) # set start and end poind of reading
+    print("start-end=\n")
+    print(start_i,end_i)
     while (start_i<end_i): # read n append a subset of input data [start_i,end_i]
         cmp_list.append(read_cmp_file(files[start_i]))
         start_i += 1
@@ -217,7 +219,7 @@ def read_Data(dir_name, info_file,n_files):
     reshaped_data = np_data.reshape(tframes,in_nodes_dim) # reshape data to ndarray shape=(n_total_frames,in_nodes_dim)
     print('\nreshaped= ')
     print(reshaped_data.shape)
-    
+
     return(reshaped_data,np_labels,total_frames)
 
 
