@@ -1,0 +1,9 @@
+src/__pycache__/
+Variables/
+Variables2/
+Variables3/
+*.pyc
+*.meta
+*.index
+*.data
+
