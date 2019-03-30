@@ -1,3 +1,7 @@
+#----------------------------------------------------------------------------------------------------------------
+#                                READ DATA & LABELS METHODs
+#_________________________________________________________________________________________________________________
+
 # script for reading each .cmp file from directories
 # and then create images
 import os
@@ -30,6 +34,7 @@ def read_label(filename):
                 pass
 
     return class_type
+
 # read a subset of labels
 def read_subset_labels(file_name,n_files):
     labels_list = read_label(file_name) # file name of where labels are saved
@@ -55,8 +60,12 @@ def one_hot_encode(labels):
     ohe[np.arange(n_labels),labels] = 1
     return ohe
 
+# keeps information about files left to be read
+# helping for loop steps
+# @filename : name of file depends
+# @n_files : number of files to be read [==step of loop]
+# @total_files : how many files per dataset
 def read_status_upd(file_name,n_files,total_files):
-
     read_status_file= file_name+'_status.txt' # status file's name
     if os.path.exists(read_status_file):
         f = open(read_status_file,"r")
@@ -87,7 +96,7 @@ def read_status_upd(file_name,n_files,total_files):
 # read  n_files .cmp files from a directory and create an array of them
 # plus from a list of labels return a subset according the n_files
 def read_cmp_dir(folder_name,class_types,n_files):
-    files = g.glob(dir_n+"/"+folder_name + "/*.cmp")
+    files = g.glob(dir_n+"/"+folder_name + "/*.cmp")    # read all files from a folder
     total_files = len(files)
     cmp_list = []
     start_i,end_i = read_status_upd(folder_name,n_files,total_files) # set start and end poind of reading
@@ -100,7 +109,7 @@ def read_cmp_dir(folder_name,class_types,n_files):
     return cmp_list
 
 
-# read .cmp a file and converted to numpy array (transposed)
+# read a .cmp file and converted to numpy array (transposed)
 def read_cmp_file(cmp_filename):
     nfilt = 64
     with open(cmp_filename, 'rb') as fid:
@@ -115,7 +124,6 @@ def read_cmp_file(cmp_filename):
     return (cmp_data)
 
 # convert .cmp file to image
-# what is params ?? cmp_data
 # converts cmp files to image and take transpose of img array
 def convert_to_images(params):
     context_width = 17
