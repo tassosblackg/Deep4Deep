@@ -35,7 +35,8 @@ def read_subset_labels(file_name,n_files):
     labels_list = read_label(file_name) # file name of where labels are saved
     total_files = len(labels_list)
     subset_labels = []
-    start_i,end_i = read_status_upd(file_name+'labels',n_files,total_files)
+    status_file_name = os.path.splitext(file_name)[0] + '_labels'
+    start_i,end_i = read_status_upd(status_file_name,n_files,total_files)
     while (start_i<end_i): # read n append a subset of input data [start_i,end_i]
         subset_labels.append(labels_list[start_i]) # take one record
         start_i += 1
