@@ -272,7 +272,7 @@ class CNN(object):
         end_time=time.clock()
         print('Total time = ' + str(end_time - start_time))
 
-
+    # like define train operations
     def define_predict_operations(self):
         self.keep_prob    = tf.placeholder(dtype=tf.float32,name='keep_prob')       # placeholder for keeping dropout probality
 
@@ -280,14 +280,17 @@ class CNN(object):
 
         self.Y_eval = tf.placeholder(dtype=tf.int32, shape=(None, self.n_classes),name='Y_eval')  # Define this
 
-        self.Y_eval_predict =tf.nn.softmax(self.model_architecture(self.X_eval,keep_prob,reuse=True,is_training=False)) # make a prediction using inference softmax
-
+        self.Y_eval_predict = self.model_architecture(self.X_eval,self.keep_prob,reuse=True,is_training=False) # make a prediction using inference softmax
         #Return the index with the largest value across axis
         Ypredict = tf.argmax(self.Y_eval_predict, axis=1, output_type=tf.int32) #in [0,1,2]
+
         #Cast a boolean tensor to float32
         correct = tf.cast(tf.equal(Ypredict, self.Y_eval), tf.float32)
         self.accuracy_graph = tf.reduce_mean(correct)
-
+    # like train - train epoch
     def predict_utterance(self,sess,Xeval_in,Yeval_in):
-        accuracy=sess.run(self.accuracy_graph, feed_dict={self.X_eval: Xeval_in, self.Y_eval: Yeval_in})
+        # initialize variables
+        init = tf.group(tf.global_variables_initializer)
+        sess.run(init)
+        accuracy=sess.run(self.accuracy_graph, feed_dict={self.X_eval: Xeval_in, self.Y_eval: Yeval_in,self.keep_prob:1.0})
         return accuracy
