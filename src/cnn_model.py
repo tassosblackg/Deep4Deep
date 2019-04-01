@@ -147,6 +147,7 @@ class CNN(object):
         # calculate training loss between real label and predicted
         self.train_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=Y_train_predict, labels=self.Y_train,name='train_loss'))
 
+
         # define learning rate decay method
         global_step = tf.Variable(0, trainable=False, name='global_step')
         # Define it--play with this
@@ -162,11 +163,33 @@ class CNN(object):
         # --- Validation computations
         self.X_valid = tf.placeholder(dtype=tf.float32, shape=(None, self.n_input))  # Define this
         self.Y_valid = tf.placeholder(dtype=tf.int32, shape=(None,self.n_classes))  # Define this
-
+        # logits layer without softmax
         Y_valid_predict = self.model_architecture(self.X_valid,self.keep_prob,reuse=True)
 
         # Loss on validation
         self.valid_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=Y_valid_predict, labels=self.Y_valid,name='valid_loss'))
+    # evaluation method
+    def evaluate(sess,Xtest,Ytest,is_train=True):
+        if(is_train):
+            #calculate train accuracy
+            y_softmax = self.inference(self.Xtrain_in,self.keep_prob) # apply softmax at the last layer
+            y_pred = tf.argmax(y_train_softmax,axis=1,output_type=tf.int32)
+            y_correct = tf.argmax(self.Y_train, axis=1, output_type=tf.int32)
+            # Cast a boolean tensor to float32
+            correct = tf.cast(tf.equal(y_train_pred, y_correct), tf.float32)
+            accuracy_graph = tf.reduce_mean(correct)
+
+            accuracy = sess.run(accuracy_graph,feed_dict={self.X_train: Xtest,self.Y_train: Ytest,self.keep_prob:1.0})
+        else:
+            # calculate validation accuracy
+            y_softmax = self.inference(self.Xvalid_in,self.keep_prob) # apply softmax at the last layer
+            y_pred = tf.argmax(y_train_softmax,axis=1,output_type=tf.int32)
+            y_correct = tf.argmax(self.Y_valid, axis=1, output_type=tf.int32)
+            # Cast a boolean tensor to float32
+            correct = tf.cast(tf.equal(y_train_pred, y_correct), tf.float32)
+            accuracy_graph = tf.reduce_mean(correct)
+            accuracy = sess.run(accuracy_graph,feed_dict={self.X_valid: Xtest,self.Y_valid: Ytest,self.keep_prob:1.0})
+        return accuracy
 
     # define train actions per epoch
     def train_epoch(self,sess):
@@ -264,6 +287,7 @@ class CNN(object):
                 early_stop_counter=0
             else:
                 early_stop_counter += 1
+            # evaluate training
 
             # stop training when overfiiting conditon is true
             if early_stop_counter > n_early_stop_epochs:
