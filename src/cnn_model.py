@@ -124,13 +124,14 @@ class CNN(object):
             # fc1 = tf.nn.dropout(fc1,self.dropouttop)
             fc2 = mf.fully_con(fc1,512,'fc2')
 
-            logits = mf.outp_layer(fc2,self.n_classes,'Last_layer')
+            logits = mf.dense_layer(fc2,self.n_classes,'Last_layer')    # last layer not activation function is used for trainning only
+            # logits = mf.outp_layer(fc2,self.n_classes,'Last_layer')
             print('Logits_shape='+str(logits.shape))
         return logits
 
     # last layer of network is a softmax output
+    # apply softmax layer to logits is used for evaluation
     def inference(self,X,keep_prob):
-        # return mf.outp_layer(X,self.n_classes)
         return tf.nn.softmax(self.model_architecture(X,keep_prob,reuse=True,is_training=False))
 
     def define_train_operations(self):
