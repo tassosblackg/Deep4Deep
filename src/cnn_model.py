@@ -293,7 +293,6 @@ class CNN(object):
                 valid_acc = self.evaluate(sess,self.Xvalid_in,self.Yvalid_in,is_train=False)
                 print('[epoch= '+str(epoch) + ', train_acc ={:.3f}' .format(train_acc)+'valid_acc ={:.3f}'.format(valid_acc) +']\n')
 
-
             # stop training when overfiiting conditon is true
             if early_stop_counter > n_early_stop_epochs:
                 # too many consecutive epochs without surpassing the best model
