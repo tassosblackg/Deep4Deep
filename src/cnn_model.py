@@ -169,8 +169,8 @@ class CNN(object):
         # Loss on validation
         self.valid_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=Y_valid_predict, labels=self.Y_valid,name='valid_loss'))
     # evaluation method
-    def evaluate(sess,Xtest,Ytest,is_train=True):
-        if(is_train):
+    def evaluate(sess,Xtest,Ytest,train=True):
+        if(train==True):
             #calculate train accuracy
             y_softmax = self.inference(self.Xtrain_in,self.keep_prob) # apply softmax at the last layer
             y_pred = tf.argmax(y_train_softmax,axis=1,output_type=tf.int32)
@@ -289,8 +289,8 @@ class CNN(object):
                 early_stop_counter += 1
             # evaluate training
             if (epoch % 10 == 0):
-                train_acc = self.evaluate(sess,self.Xtrain_in,self.Ytrain_in,is_train=True)
-                valid_acc = self.evaluate(sess,self.Xvalid_in,self.Yvalid_in,is_train=False)
+                train_acc = self.evaluate(sess,self.Xtrain_in,self.Ytrain_in,train=True)
+                valid_acc = self.evaluate(sess,self.Xvalid_in,self.Yvalid_in,train=False)
                 print('[epoch= '+str(epoch) + ', train_acc ={:.3f}' .format(train_acc)+'valid_acc ={:.3f}'.format(valid_acc) +']\n')
 
             # stop training when overfiiting conditon is true
