@@ -49,8 +49,8 @@ def restore_variables(sess):
     variables_to_restore = {
     var.name[:-2]: var for var in tf.trainable_variables()
         if not ('state_buffer' in var.name or 'pointer' in var.name)}
-    print("VAR=")
-    print(variables_to_restore)
+    # print("VAR=")
+    # print(variables_to_restore)
     saver = tf.train.Saver(variables_to_restore)
 
     model_path ='../Variables3' # Define it
