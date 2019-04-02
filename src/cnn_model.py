@@ -121,7 +121,7 @@ class CNN(object):
             #           --{FULLY CONNECTED LAYERS}--
             flatt_out = mf.flatten_l(max_pool_5,'flatten_out_layer')
             fc1 = mf.fully_con(flatt_out,256,'fc1')
-            # fc1 = tf.nn.dropout(fc1,self.dropouttop)
+            fc1 = tf.nn.dropout(fc1,self.dropout)
             fc2 = mf.fully_con(fc1,512,'fc2')
 
             logits = mf.dense_layer(fc2,self.n_classes,'Last_layer')    # last layer not activation function is used for trainning only
