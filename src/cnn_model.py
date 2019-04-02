@@ -173,20 +173,20 @@ class CNN(object):
         if(train==True):
             #calculate train accuracy
             y_softmax = self.inference(self.Xtrain_in,self.keep_prob) # apply softmax at the last layer
-            y_pred = tf.argmax(y_train_softmax,axis=1,output_type=tf.int32)
+            y_pred = tf.argmax(y_softmax,axis=1,output_type=tf.int32)
             y_correct = tf.argmax(self.Y_train, axis=1, output_type=tf.int32)
             # Cast a boolean tensor to float32
-            correct = tf.cast(tf.equal(y_train_pred, y_correct), tf.float32)
+            correct = tf.cast(tf.equal(y_pred, y_correct), tf.float32)
             accuracy_graph = tf.reduce_mean(correct)
 
             accuracy = sess.run(accuracy_graph,feed_dict={self.X_train: Xtest,self.Y_train: Ytest,self.keep_prob:1.0})
         else:
             # calculate validation accuracy
             y_softmax = self.inference(self.Xvalid_in,self.keep_prob) # apply softmax at the last layer
-            y_pred = tf.argmax(y_train_softmax,axis=1,output_type=tf.int32)
+            y_pred = tf.argmax(y_softmax,axis=1,output_type=tf.int32)
             y_correct = tf.argmax(self.Y_valid, axis=1, output_type=tf.int32)
             # Cast a boolean tensor to float32
-            correct = tf.cast(tf.equal(y_train_pred, y_correct), tf.float32)
+            correct = tf.cast(tf.equal(y_pred, y_correct), tf.float32)
             accuracy_graph = tf.reduce_mean(correct)
             accuracy = sess.run(accuracy_graph,feed_dict={self.X_valid: Xtest,self.Y_valid: Ytest,self.keep_prob:1.0})
         return accuracy
