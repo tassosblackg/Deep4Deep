@@ -15,7 +15,14 @@ try:
     model_id = get_model_id()
 
     n_files=550
+# create network
+model_id = get_model_id()
+network = CNN(model_id)
+network.define_predict_operations()
 
+sess = tf.Session()
+
+restore_variables(sess,cfg)
 
 except Exception :
     traceback.print_exc()
