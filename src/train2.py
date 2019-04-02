@@ -50,7 +50,7 @@ try:
                 network.train(sess,iter)
                 iter += 1
                 flag = 0
-                # save()
+                if(network.kill):break # if overfitting kill loop
             except KeyboardInterrupt:
                 print()
                 flag = 1
