@@ -169,7 +169,7 @@ class CNN(object):
         # Loss on validation
         self.valid_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=Y_valid_predict, labels=self.Y_valid,name='valid_loss'))
     # evaluation method
-    def evaluate(sess,Xtest,Ytest,train=True):
+    def evaluate(self,sess,Xtest,Ytest,train=True):
         if(train==True):
             #calculate train accuracy
             y_softmax = self.inference(self.Xtrain_in,self.keep_prob) # apply softmax at the last layer
