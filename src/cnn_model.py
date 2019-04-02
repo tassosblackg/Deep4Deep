@@ -37,6 +37,9 @@ class CNN(object):
         self.valid_size = 0
         self.eval_size = 0
 
+        # flag to early stopping
+        self.kill = False
+
 
     def model_architecture(self, X, keep_prob,reuse=True,is_training=True):
         with tf.variable_scope("model_architecture", reuse=reuse):
@@ -168,6 +171,7 @@ class CNN(object):
 
         # Loss on validation
         self.valid_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=Y_valid_predict, labels=self.Y_valid,name='valid_loss'))
+
     # evaluation method
     def evaluate(self,sess,Xtest,Ytest,train=True):
         if(train==True):
@@ -204,7 +208,7 @@ class CNN(object):
 
         while Xbatch is not None:     # loop through train batches:
             mean_loss, _ = sess.run([self.train_loss, self.update_ops], feed_dict={self.X_train: Xbatch ,self.Y_train: Ybatch,self.keep_prob:self.dropout})
-            Xbatch,Ybatch,indx=mf.read_nxt_batch(X,Y,self.batch_size,indx)
+            Xbatch,Ybatch,indx = mf.read_nxt_batch(X,Y,self.batch_size,indx)
             if math.isnan(mean_loss):
                 print('train cost is NaN')
                 break
@@ -230,7 +234,7 @@ class CNN(object):
         while Xbatch is not None  :
             # print("batch_i="+str(total_batches)+"/"+str(n_batches)+"\n")
             mean_loss = sess.run(self.valid_loss, feed_dict={self.X_valid: Xbatch,self.Y_valid: Ybatch,self.keep_prob:1.0})
-            Xbatch,Ybatch,indx=mf.read_nxt_batch(X,Y,self.batch_size,indx)
+            Xbatch,Ybatch,indx = mf.read_nxt_batch(X,Y,self.batch_size,indx)
             if math.isnan(mean_loss):
                 print('valid cost is NaN')
                 break
@@ -255,7 +259,7 @@ class CNN(object):
         # create saver object
         saver = tf.train.Saver(var_list = tf.trainable_variables(), max_to_keep = 4)
 
-        early_stop_counter=0
+        early_stop_counter = 0
 
         # initialize train variables
         init_op = tf.group(tf.global_variables_initializer())
@@ -276,15 +280,15 @@ class CNN(object):
             # print("valid ends")
             epoch_end_time=time.clock()
             if (epoch % 10 == 0):
-                info_str='Epoch='+str(epoch) + ', Train: ' + str(train_loss) + ', Valid: '
+                info_str ='Epoch='+str(epoch) + ', Train: ' + str(train_loss) + ', Valid: '
                 info_str += str(valid_loss) + ', Time=' +str(epoch_end_time - epoch_start_time)
                 print(info_str)
 
             if valid_loss < min_valid_loss:
                 print('Best epoch=' + str(epoch))
                 save_variables(sess, saver, epoch, self.model_id)
-                min_valid_loss=valid_loss
-                early_stop_counter=0
+                min_valid_loss = valid_loss
+                early_stop_counter = 0
             else:
                 early_stop_counter += 1
             # # evaluate training
@@ -297,6 +301,7 @@ class CNN(object):
             if early_stop_counter > n_early_stop_epochs:
                 # too many consecutive epochs without surpassing the best model
                 print('stopping early')
+                self.kill = True
                 break
         end_time=time.clock()
         print('Total time = ' + str(end_time - start_time))
