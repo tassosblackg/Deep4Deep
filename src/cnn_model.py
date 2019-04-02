@@ -290,7 +290,7 @@ class CNN(object):
             # evaluate training
             if (epoch % 10 == 0):
                 train_acc = self.evaluate(sess,self.Xtrain_in,self.Ytrain_in)
-                print('[epoch= '+str(epoch) + ', train_acc ={:5f}' .format(train_acc))
+                print('[epoch= '+str(epoch) + ', train_acc ={:.3f}' .format(train_acc))
             # stop training when overfiiting conditon is true
             if early_stop_counter > n_early_stop_epochs:
                 # too many consecutive epochs without surpassing the best model
