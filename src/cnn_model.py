@@ -121,7 +121,7 @@ class CNN(object):
             #           --{FULLY CONNECTED LAYERS}--
             flatt_out = mf.flatten_l(max_pool_5,'flatten_out_layer')
             fc1 = mf.fully_con(flatt_out,256,'fc1')
-            fc1 = tf.nn.dropout(fc1,self.dropout)
+            # fc1 = tf.nn.dropout(fc1,self.dropout)
             fc2 = mf.fully_con(fc1,512,'fc2')
 
             logits = mf.dense_layer(fc2,self.n_classes,'Last_layer')    # last layer not activation function is used for trainning only
@@ -246,8 +246,8 @@ class CNN(object):
     def train(self,sess,iter):
         start_time = time.clock()
 
-        n_early_stop_epochs = 10  # Define it
-        n_epochs = 30  # Define it
+        n_early_stop_epochs = 90  # Define it
+        n_epochs = 150  # Define it
 
         # restore variables from previous train session
         if(iter>0): restore_variables(sess)
@@ -275,10 +275,10 @@ class CNN(object):
             valid_loss = self.valid_epoch(sess)
             # print("valid ends")
             epoch_end_time=time.clock()
-
-            info_str='Epoch='+str(epoch) + ', Train: ' + str(train_loss) + ', Valid: '
-            info_str += str(valid_loss) + ', Time=' +str(epoch_end_time - epoch_start_time)
-            print(info_str)
+            if (epoch % 10 == 0):
+                info_str='Epoch='+str(epoch) + ', Train: ' + str(train_loss) + ', Valid: '
+                info_str += str(valid_loss) + ', Time=' +str(epoch_end_time - epoch_start_time)
+                print(info_str)
 
             if valid_loss < min_valid_loss:
                 print('Best epoch=' + str(epoch))
