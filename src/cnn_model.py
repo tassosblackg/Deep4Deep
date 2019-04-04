@@ -1,6 +1,6 @@
 from __future__ import division, print_function
 import model_func as mf
-
+import traceback
 import sys
 import time
 from datetime import datetime
@@ -146,9 +146,9 @@ class CNN(object):
         self.Y_train   = tf.placeholder(dtype=tf.int32,shape=(None, self.n_classes), name='Y_train')
 
         # network prediction
-        Y_train_predict = self.model_architecture(self.X_train,self.keep_prob,reuse=False)
+        self.Y_train_predict = self.model_architecture(self.X_train,self.keep_prob,reuse=False)
         # calculate training loss between real label and predicted
-        self.train_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=Y_train_predict, labels=self.Y_train,name='train_loss'))
+        self.train_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=self.Y_train_predict, labels=self.Y_train,name='train_loss'))
 
 
         # define learning rate decay method
@@ -167,32 +167,33 @@ class CNN(object):
         self.X_valid = tf.placeholder(dtype=tf.float32, shape=(None, self.n_input))  # Define this
         self.Y_valid = tf.placeholder(dtype=tf.int32, shape=(None,self.n_classes))  # Define this
         # logits layer without softmax
-        Y_valid_predict = self.model_architecture(self.X_valid,self.keep_prob,reuse=True)
+        self.Y_valid_predict = self.model_architecture(self.X_valid,self.keep_prob,reuse=True)
 
         # Loss on validation
-        self.valid_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=Y_valid_predict, labels=self.Y_valid,name='valid_loss'))
+        self.valid_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=self.Y_valid_predict, labels=self.Y_valid,name='valid_loss'))
+
 
     # evaluation method
-    def evaluate(self,sess,Xtest,Ytest,train=True):
+    def evaluate(self,sess,train=True):
+
         if(train==True):
-            #calculate train accuracy
-            y_softmax = self.inference(self.Xtrain_in,self.keep_prob) # apply softmax at the last layer
-            y_pred = tf.argmax(y_softmax,axis=1,output_type=tf.int32)
+            y_train_softmax = self.inference(self.X_train,self.keep_prob)
+            y_pred = tf.argmax(self.y_train_softmax,axis=1,output_type=tf.int32)
             y_correct = tf.argmax(self.Y_train, axis=1, output_type=tf.int32)
             # Cast a boolean tensor to float32
             correct = tf.cast(tf.equal(y_pred, y_correct), tf.float32)
             accuracy_graph = tf.reduce_mean(correct)
 
-            accuracy = sess.run(accuracy_graph,feed_dict={self.X_train: Xtest,self.Y_train: Ytest,self.keep_prob:1.0})
+            accuracy = sess.run(accuracy_graph,feed_dict={self.X_train: self.Xtrain_in,self.Y_train: self.Ytrain_in,self.keep_prob:1.0})
         else:
-            # calculate validation accuracy
-            y_softmax = self.inference(self.Xvalid_in,self.keep_prob) # apply softmax at the last layer
-            y_pred = tf.argmax(y_softmax,axis=1,output_type=tf.int32)
+            # #calculate train accuracy
+            y_valid_softmax = self.inference(self.X_valid,self.keep_prob) # apply softmax at the last layer
+            y_pred = tf.argmax(self.y_valid_softmax,axis=1,output_type=tf.int32)
             y_correct = tf.argmax(self.Y_valid, axis=1, output_type=tf.int32)
             # Cast a boolean tensor to float32
             correct = tf.cast(tf.equal(y_pred, y_correct), tf.float32)
             accuracy_graph = tf.reduce_mean(correct)
-            accuracy = sess.run(accuracy_graph,feed_dict={self.X_valid: Xtest,self.Y_valid: Ytest,self.keep_prob:1.0})
+            accuracy = sess.run(accuracy_graph,feed_dict={self.X_valid: self.Xvalid_in,self.Y_valid: self.Yvalid_in,self.keep_prob:1.0})
         return accuracy
 
     # define train actions per epoch
@@ -250,8 +251,8 @@ class CNN(object):
     def train(self,sess,iter):
         start_time = time.clock()
 
-        n_early_stop_epochs = 90  # Define it
-        n_epochs = 150  # Define it
+        n_early_stop_epochs = 10  # Define it
+        n_epochs = 30  # Define it
 
         # restore variables from previous train session
         if(iter>0): restore_variables(sess)
@@ -291,11 +292,15 @@ class CNN(object):
                 early_stop_counter = 0
             else:
                 early_stop_counter += 1
-            # # evaluate training
-            # if (epoch % 10 == 0):
-            #     train_acc = self.evaluate(sess,self.Xtrain_in,self.Ytrain_in,train=True)
-            #     valid_acc = self.evaluate(sess,self.Xvalid_in,self.Yvalid_in,train=False)
-            #     print('[epoch= '+str(epoch) + ', train_acc ={:.3f}' .format(train_acc)+'valid_acc ={:.3f}'.format(valid_acc) +']\n')
+            # try:
+            #     # evaluate training
+            #     if (epoch % 10 == 0):
+            #         train_acc = self.evaluate(sess,train=True)
+            #         # valid_acc = self.evaluate(sess,train=False)
+            #         print('[**epoch= '+str(epoch) + ', train_acc ={:.3f}' .format(train_acc)+'valid_acc ={:.3f}'.format(valid_acc) +' **]\n')
+            # except Exception as e:
+            #     print('-7-\n')
+            #     traceback.print_exc()
 
             # stop training when overfiiting conditon is true
             if early_stop_counter > n_early_stop_epochs:
