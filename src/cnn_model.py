@@ -164,8 +164,8 @@ class CNN(object):
         self.update_ops = optimizer.minimize(self.train_loss, var_list=trainable, global_step=global_step)
 
         # --- Validation computations
-        self.X_valid = tf.placeholder(dtype=tf.float32, shape=(None, self.n_input))  # Define this
-        self.Y_valid = tf.placeholder(dtype=tf.int32, shape=(None,self.n_classes))  # Define this
+        self.X_valid = tf.placeholder(dtype=tf.float32, shape=(None, self.n_input),name='X_valid')  # Define this
+        self.Y_valid = tf.placeholder(dtype=tf.int32, shape=(None,self.n_classes),anme='Y_valid')  # Define this
         # logits layer without softmax
         self.Y_valid_predict = self.model_architecture(self.X_valid,self.keep_prob,reuse=True)
 
@@ -177,7 +177,7 @@ class CNN(object):
     def evaluate(self,sess,train=True):
 
         if(train==True):
-            y_train_softmax = self.inference(self.X_train,self.keep_prob)
+            self.y_train_softmax = self.inference(self.X_train,self.keep_prob)
             y_pred = tf.argmax(self.y_train_softmax,axis=1,output_type=tf.int32)
             y_correct = tf.argmax(self.Y_train, axis=1, output_type=tf.int32)
             # Cast a boolean tensor to float32
@@ -187,7 +187,7 @@ class CNN(object):
             accuracy = sess.run(accuracy_graph,feed_dict={self.X_train: self.Xtrain_in,self.Y_train: self.Ytrain_in,self.keep_prob:1.0})
         else:
             # #calculate train accuracy
-            y_valid_softmax = self.inference(self.X_valid,self.keep_prob) # apply softmax at the last layer
+            self.y_valid_softmax = self.inference(self.X_valid,self.keep_prob) # apply softmax at the last layer
             y_pred = tf.argmax(self.y_valid_softmax,axis=1,output_type=tf.int32)
             y_correct = tf.argmax(self.Y_valid, axis=1, output_type=tf.int32)
             # Cast a boolean tensor to float32
