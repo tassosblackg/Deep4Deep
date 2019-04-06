@@ -165,7 +165,7 @@ class CNN(object):
 
         # --- Validation computations
         self.X_valid = tf.placeholder(dtype=tf.float32, shape=(None, self.n_input),name='X_valid')  # Define this
-        self.Y_valid = tf.placeholder(dtype=tf.int32, shape=(None,self.n_classes),anme='Y_valid')  # Define this
+        self.Y_valid = tf.placeholder(dtype=tf.int32, shape=(None,self.n_classes),name='Y_valid')  # Define this
         # logits layer without softmax
         self.Y_valid_predict = self.model_architecture(self.X_valid,self.keep_prob,reuse=True)
 
