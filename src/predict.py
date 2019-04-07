@@ -22,24 +22,27 @@ try:
     # create network
     model_id = get_model_id()
     network = CNN(model_id)
-    network.define_train_operations()
-    for i in range(0,total_inp_files,n_tfiles):
+    network.define_predict_operations()
+    # for i in range(0,total_inp_files,n_tfiles):
 
-        mf.input(network,n_tfiles,n_vfiles)
-        with tf.device('/gpu:0'):
+    mf.input(network,n_tfiles,n_vfiles)
+    with tf.device('/gpu:0'):
+        # with graph.as_default() as graph:
+        saver = tf.train.Saver()
 
-            sess = tf.Session(config=tf.ConfigProto(allow_soft_placement = True))
-
-            restore_variables(sess) # load last chkp
-            network.evaluate(sess)
-            try:
-
-                train_acc = self.evaluate(sess,train=True)
-                valid_acc = self.evaluate(sess,train=False)
-                print('[**  train_acc ={:.3f}' .format(train_acc)+'valid_acc ={:.3f}'.format(valid_acc) +' **]\n')
-            except Exception as e:
-                print('-7-\n')
-                traceback.print_exc()
+        with tf.Session(graph=graph) as sess:
+            saver.restore(sess)
+        #restore_variables(sess) # load last chkp
+        # network.predict_utterance(sess)
+        # network.evaluate(sess)
+        # try:
+        #
+        #     train_acc = self.evaluate(sess,train=True)
+        #     valid_acc = self.evaluate(sess,train=False)
+        #     print('[**  train_acc ={:.3f}' .format(train_acc)+'valid_acc ={:.3f}'.format(valid_acc) +' **]\n')
+        # except Exception as e:
+        #     print('-7-\n')
+        #     traceback.print_exc()
 except Exception :
     traceback.print_exc()
     flag=1
