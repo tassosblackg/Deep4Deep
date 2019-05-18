@@ -24,7 +24,8 @@ class CNN(object):
         self.Ytrain_in = np.empty(0)
         self.Xvalid_in = np.empty(0)
         self.Yvalid_in = np.empty(0)
-
+        self.Xeval_in  = np.empty(0)
+        self.Yeval_in  = np.empty(0)
         # model variables
         self.height = 64
         self.width = 17
@@ -51,73 +52,74 @@ class CNN(object):
             w1 = mf.weight_dict(shape,'w1')
             b1 = mf.bias_dict([shape[3]],'b1')
             conv_l1 = mf.conv2d(X,w1,b1,'conv_l1')
-            conv_l1 = mf.batch_n(conv_l1,'batch_norm_l1')
-            # 2nd layer
-            shape = [3,3,4,4]
-            w2 = mf.weight_dict(shape,'w2')
-            b2 = mf.bias_dict([shape[3]],'b2')
-            conv_l2 = mf.conv2d(conv_l1,w2,b2,'conv_l2')
-            conv_l2 = mf.batch_n(conv_l2,'batch_norm_l2')
+            # conv_l1 = mf.batch_n(conv_l1,'batch_norm_l1')
+            # # 2nd layer
+            # shape = [3,3,4,4]
+            # w2 = mf.weight_dict(shape,'w2')
+            # b2 = mf.bias_dict([shape[3]],'b2')
+            # conv_l2 = mf.conv2d(conv_l1,w2,b2,'conv_l2')
+            # conv_l2 = mf.batch_n(conv_l2,'batch_norm_l2')
 
-            max_pool_1 = mf.max_pool(conv_l2,1,1,'max_pool_bl2')
+            # max_pool_1 = mf.max_pool(conv_l2,1,1,'max_pool_bl2')
+
             #               --{2nd BLOCK}--
             # 3d layer
-            shape = [3,3,4,8]
-            w3 = mf.weight_dict(shape,'w3')
-            b3 = mf.bias_dict([shape[3]],'b3')
-            conv_l3 = mf.conv2d(max_pool_1,w3,b3,'conv_l3')
-            conv_l3 = mf.batch_n(conv_l3,'batch_norm_l3')
-            # 4th layer
-            shape = [3,3,8,8]
-            w4 = mf.weight_dict(shape,'w4')
-            b4 = mf.bias_dict([shape[3]],'b4')
-            conv_l4 = mf.conv2d(conv_l3,w4,b4,'conv_l4')
-            conv_l4 = mf.batch_n(conv_l4,'batch_norm_l4')
-
-            max_pool_2 = mf.max_pool(conv_l4,1,1,'max_pool_bl2')
+            # shape = [3,3,4,8]
+            # w3 = mf.weight_dict(shape,'w3')
+            # b3 = mf.bias_dict([shape[3]],'b3')
+            # conv_l3 = mf.conv2d(conv_l1,w3,b3,'conv_l3')
+            # conv_l3 = mf.batch_n(conv_l3,'batch_norm_l3')
+            # # 4th layer
+            # shape = [3,3,8,8]
+            # w4 = mf.weight_dict(shape,'w4')
+            # b4 = mf.bias_dict([shape[3]],'b4')
+            # conv_l4 = mf.conv2d(conv_l3,w4,b4,'conv_l4')
+            # conv_l4 = mf.batch_n(conv_l4,'batch_norm_l4')
+            #
+            # max_pool_2 = mf.max_pool(conv_l4,1,1,'max_pool_bl2')
             #               --{3d BLOCK}--
             # 5th layer
-            shape = [3,3,8,16]
-            w5 = mf.weight_dict(shape,'w5')
-            b5 = mf.bias_dict([shape[3]],'b5')
-            conv_l5 = mf.conv2d(max_pool_2,w5,b5,'conv_l5')
-            conv_l5 = mf.batch_n(conv_l5,'batch_norm_l5')
+            # shape = [3,3,8,16]
+            # w5 = mf.weight_dict(shape,'w5')
+            # b5 = mf.bias_dict([shape[3]],'b5')
+            # conv_l5 = mf.conv2d(max_pool_2,w5,b5,'conv_l5')
+            # conv_l5 = mf.batch_n(conv_l5,'batch_norm_l5')
             # 6th layer
-            shape = [3,3,16,16]
-            w6 = mf.weight_dict(shape,'w6')
-            b6 = mf.bias_dict([shape[3]],'b6')
-            conv_l6 = mf.conv2d(conv_l5,w6,b6,'conv_l6')
-            conv_l6 = mf.batch_n(conv_l6,'batch_norm_l6')
-
-            max_pool_3 = mf.max_pool(conv_l6,1,1,'max_pool_3')
+            # shape = [3,3,16,16]
+            # w6 = mf.weight_dict(shape,'w6')
+            # b6 = mf.bias_dict([shape[3]],'b6')
+            # conv_l6 = mf.conv2d(conv_l5,w6,b6,'conv_l6')
+            # conv_l6 = mf.batch_n(conv_l6,'batch_norm_l6')
+            #
+            # max_pool_3 = mf.max_pool(conv_l6,1,1,'max_pool_3')
             #               --{4th BLOCK}
             # 7th layer
-            shape = [3,3,16,32]
-            w7 = mf.weight_dict(shape,'w7')
-            b7 = mf.bias_dict([shape[3]],'b7')
-            conv_l7 = mf.conv2d(max_pool_3,w7,b7,'conv_l7')
-            conv_l7 = mf.batch_n(conv_l7,'batch_norm_l7')
+            # shape = [3,3,16,32]
+            # w7 = mf.weight_dict(shape,'w7')
+            # b7 = mf.bias_dict([shape[3]],'b7')
+            # conv_l7 = mf.conv2d(conv_l5,w7,b7,'conv_l7')
+            # conv_l7 = mf.batch_n(conv_l7,'batch_norm_l7')
             # 8th layer
-            shape = [3,3,32,32]
-            w8 = mf.weight_dict(shape,'w8')
-            b8 = mf.bias_dict([shape[3]],'b8')
-            conv_l8 = mf.conv2d(conv_l7,w8,b8,'conv_l8')
-            conv_l8 = mf.batch_n(conv_l8,'batch_norm_l8')
-
-            max_pool_4 = mf.max_pool(conv_l8,2,2,'max_pool_4')
+            # shape = [3,3,32,32]
+            # w8 = mf.weight_dict(shape,'w8')
+            # b8 = mf.bias_dict([shape[3]],'b8')
+            # conv_l8 = mf.conv2d(conv_l7,w8,b8,'conv_l8')
+            # conv_l8 = mf.batch_n(conv_l8,'batch_norm_l8')
+            #
+            # max_pool_4 = mf.max_pool(conv_l8,2,2,'max_pool_4')
             #               --{5th BLOCK}
             # 9th layer
-            shape =[3,3,32,64]
+            shape =[3,3,4,64]
             w9 = mf.weight_dict(shape,'w9')
             b9 = mf.bias_dict([shape[3]],'b9')
-            conv_l9 = mf.conv2d(max_pool_4,w9,b9,'conv_l9')
-            conv_l9 = mf.batch_n(conv_l9,'batch_norm_l9')
+            conv_l9 = mf.conv2d(conv_l1,w9,b9,'conv_l9')
+            # conv_l9 = mf.batch_n(conv_l9,'batch_norm_l9')
             # 10th layer
             shape = [3,3,64,64]
             w10 = mf.weight_dict(shape,'w10')
             b10 = mf.bias_dict([shape[3]],'b10')
             conv_l10 = mf.conv2d(conv_l9,w10,b10,'conv_l10')
-            conv_l10 = mf.batch_n(conv_l10,'batch_norm_l10')
+            # conv_l10 = mf.batch_n(conv_l10,'batch_norm_l10')
 
             max_pool_5 = mf.max_pool(conv_l10,2,2,'max_pool_5')
 
@@ -125,10 +127,10 @@ class CNN(object):
             flatt_out = mf.flatten_l(max_pool_5,'flatten_out_layer')
             fc1 = mf.fully_con(flatt_out,256,'fc1')
             # fc1 = tf.nn.dropout(fc1,self.dropout)
-            fc2 = mf.fully_con(fc1,512,'fc2')
+            # fc2 = mf.fully_con(fc1,512,'fc2')
 
-            logits = mf.dense_layer(fc2,self.n_classes,'Last_layer')    # last layer not activation function is used for trainning only
-            # logits = mf.outp_layer(fc2,self.n_classes,'Last_layer')
+            logits = mf.dense_layer(fc1,self.n_classes,'Last_layer')    # last layer not activation function is used for trainning only
+            # logits = mf.outp_layer(fc1,self.n_classes,'Last_layer')
             print('Logits_shape='+str(logits.shape))
         return logits
 
@@ -154,7 +156,7 @@ class CNN(object):
         # define learning rate decay method
         global_step = tf.Variable(0, trainable=False, name='global_step')
         # Define it--play with this
-        learning_rate = 0.001
+        learning_rate = 0.00001
 
         # define the optimization algorithm
         # Define it --shall we try different type of optimizers
@@ -177,14 +179,14 @@ class CNN(object):
     def evaluate(self,sess,train=True):
 
         if(train==True):
-            self.y_train_softmax = self.inference(self.X_train,self.keep_prob)
+            self.y_train_softmax = self.inference(self.X_eval,self.keep_prob)
             y_pred = tf.argmax(self.y_train_softmax,axis=1,output_type=tf.int32)
             y_correct = tf.argmax(self.Y_train, axis=1, output_type=tf.int32)
             # Cast a boolean tensor to float32
             correct = tf.cast(tf.equal(y_pred, y_correct), tf.float32)
             accuracy_graph = tf.reduce_mean(correct)
 
-            accuracy = sess.run(accuracy_graph,feed_dict={self.X_train: self.Xtrain_in,self.Y_train: self.Ytrain_in,self.keep_prob:1.0})
+            accuracy = sess.run(accuracy_graph,feed_dict={self.X_eval: self.Xtrain_in,self.Y_eval: self.Ytrain_in,self.keep_prob:1.0})
         else:
             # #calculate train accuracy
             self.y_valid_softmax = self.inference(self.X_valid,self.keep_prob) # apply softmax at the last layer
@@ -203,6 +205,7 @@ class CNN(object):
         total_batches = 0
         # print("TOTAL="+str(self.train_size))
         n_batches = self.train_size / self.batch_size  # ??
+        print(n_batches)
         indx=0
         X,Y=mf.shuffling(self.Xtrain_in,self.Ytrain_in)                   # shuffle X ,Y data
         Xbatch,Ybatch,indx=mf.read_nxt_batch(X,Y,self.batch_size,indx)    # take the right batch
@@ -251,14 +254,15 @@ class CNN(object):
     def train(self,sess,iter):
         start_time = time.clock()
 
-        n_early_stop_epochs = 10  # Define it
+        n_early_stop_epochs = 16 # Define it
         n_epochs = 30  # Define it
 
-        # restore variables from previous train session
-        if(iter>0): restore_variables(sess)
+        # # restore variables from previous train session
+        # if(iter>0): restore_variables(sess)
 
         # create saver object
-        saver = tf.train.Saver(var_list = tf.trainable_variables(), max_to_keep = 4)
+        saver = tf.train.Saver()
+        if (iter>0): saver.restore(sess,"../VAR/model.ckpt")
 
         early_stop_counter = 0
 
@@ -280,14 +284,16 @@ class CNN(object):
             valid_loss = self.valid_epoch(sess)
             # print("valid ends")
             epoch_end_time=time.clock()
-            if (epoch % 10 == 0):
-                info_str ='Epoch='+str(epoch) + ', Train: ' + str(train_loss) + ', Valid: '
-                info_str += str(valid_loss) + ', Time=' +str(epoch_end_time - epoch_start_time)
-                print(info_str)
+            # if (epoch % 10 == 0):
+            info_str ='Epoch='+str(epoch) + ', Train:{:.10f} '  .format(train_loss) + ', Valid:{:.3f} '.format(valid_loss) + ', Time=' +str(epoch_end_time - epoch_start_time)
+            # info_str += .format(valid_loss) + ', Time=' +str(epoch_end_time - epoch_start_time)
+            print(info_str)
 
             if valid_loss < min_valid_loss:
                 print('Best epoch=' + str(epoch))
-                save_variables(sess, saver, epoch, self.model_id)
+                # save_variables(sess, saver, epoch, self.model_id)
+                saver_path = saver.save(sess,"../VAR/model.ckpt")
+                print("Model saved in path: %s" % saver_path)
                 min_valid_loss = valid_loss
                 early_stop_counter = 0
             else:
@@ -307,7 +313,7 @@ class CNN(object):
                 # too many consecutive epochs without surpassing the best model
                 print('stopping early')
                 self.kill = True
-                break
+                # break
         end_time=time.clock()
         print('Total time = ' + str(end_time - start_time))
 
@@ -319,17 +325,18 @@ class CNN(object):
 
         self.Y_eval = tf.placeholder(dtype=tf.int32, shape=(None, self.n_classes),name='Y_eval')  # Define this
 
-        self.Y_eval_predict = self.model_architecture(self.X_eval,self.keep_prob,reuse=True,is_training=False) # make a prediction using inference softmax
-        #Return the index with the largest value across axis
-        Ypredict = tf.argmax(self.Y_eval_predict, axis=1, output_type=tf.int32) #in [0,1,2]
-
-        #Cast a boolean tensor to float32
-        correct = tf.cast(tf.equal(Ypredict, self.Y_eval), tf.float32)
-        self.accuracy_graph = tf.reduce_mean(correct)
+        # self.Y_eval_predict = self.model_architecture(self.X_eval,self.keep_prob,reuse=True,is_training=False) # make a prediction using inference softmax
+        # #Return the index with the largest value across axis
+        # Ypredict = tf.argmax(self.Y_eval_predict, axis=1, output_type=tf.int32) #in [0,1,2]
+        #
+        # #Cast a boolean tensor to float32
+        # correct = tf.cast(tf.equal(Ypredict, self.Y_eval), tf.float32)
+        # self.accuracy_graph = tf.reduce_mean(correct)
     # like train - train epoch
-    def predict_utterance(self,sess,Xeval_in,Yeval_in):
+    def predict_utterance(self,sess):
         # initialize variables
         init = tf.group(tf.global_variables_initializer)
         sess.run(init)
-        accuracy=sess.run(self.accuracy_graph, feed_dict={self.X_eval: Xeval_in, self.Y_eval: Yeval_in,self.keep_prob:1.0})
-        return accuracy
+        # accuracy=sess.run(self.accuracy_graph, feed_dict={self.X_eval: Xeval_in, self.Y_eval: Yeval_in,self.keep_prob:1.0})
+        # return accuracy
+        self.evaluate(sess,True)
