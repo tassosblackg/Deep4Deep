@@ -19,7 +19,7 @@ def bias_dict(shape,name):
 def conv2d(x, W, b,name,strides=1):
     x = tf.nn.conv2d(x, W, strides=[1, strides, strides, 1], padding='SAME',name=name)
     x = tf.nn.bias_add(x,b)
-    return (x)
+    return (tf.nn.relu(x))
 
 # define convolution layer
 def conv_layer(inp, shape,name):
@@ -90,6 +90,11 @@ def input(network,n_tfiles,n_vfiles):
     # # Normalize input validation set data
     network.Xvalid_in = normalize(network.Xvalid_in)
 
+# read eval dataset
+def eval_input(network,n_efiles):
+    network.Xeval_in, network.Yeval_in, network.eval_size = rim.read_Data()
+    # Normalize
+    network.Xeval_in = normalize(network.Xeval_in)
 
 # shuffle index so to get with random order the data
 def shuffling( X,Y):
