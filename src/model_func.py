@@ -19,7 +19,7 @@ def bias_dict(shape,name):
 def conv2d(x, W, b,name,strides=1):
     x = tf.nn.conv2d(x, W, strides=[1, strides, strides, 1], padding='SAME',name=name)
     x = tf.nn.bias_add(x,b)
-    return (tf.nn.relu(x))
+    return (x)
 
 # define convolution layer
 def conv_layer(inp, shape,name):
