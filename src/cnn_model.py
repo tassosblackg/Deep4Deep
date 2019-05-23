@@ -119,7 +119,7 @@ class CNN(object):
             w10 = mf.weight_dict(shape,'w10')
             b10 = mf.bias_dict([shape[3]],'b10')
             conv_l10 = mf.conv2d(conv_l9,w10,b10,'conv_l10')
-            # conv_l10 = mf.batch_n(conv_l10,'batch_norm_l10')
+            conv_l10 = mf.batch_n(conv_l10,'batch_norm_l10')
 
             max_pool_5 = mf.max_pool(conv_l10,2,2,'max_pool_5')
 
