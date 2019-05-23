@@ -52,68 +52,68 @@ class CNN(object):
             w1 = mf.weight_dict(shape,'w1')
             b1 = mf.bias_dict([shape[3]],'b1')
             conv_l1 = mf.conv2d(X,w1,b1,'conv_l1')
-            # conv_l1 = mf.batch_n(conv_l1,'batch_norm_l1')
-            # # 2nd layer
-            # shape = [3,3,4,4]
-            # w2 = mf.weight_dict(shape,'w2')
-            # b2 = mf.bias_dict([shape[3]],'b2')
-            # conv_l2 = mf.conv2d(conv_l1,w2,b2,'conv_l2')
-            # conv_l2 = mf.batch_n(conv_l2,'batch_norm_l2')
+            conv_l1 = mf.batch_n(conv_l1,'batch_norm_l1')
+            # 2nd layer
+            shape = [3,3,4,4]
+            w2 = mf.weight_dict(shape,'w2')
+            b2 = mf.bias_dict([shape[3]],'b2')
+            conv_l2 = mf.conv2d(conv_l1,w2,b2,'conv_l2')
+            conv_l2 = mf.batch_n(conv_l2,'batch_norm_l2')
 
-            # max_pool_1 = mf.max_pool(conv_l2,1,1,'max_pool_bl2')
+            max_pool_1 = mf.max_pool(conv_l2,1,1,'max_pool_bl2')
 
             #               --{2nd BLOCK}--
             # 3d layer
-            # shape = [3,3,4,8]
-            # w3 = mf.weight_dict(shape,'w3')
-            # b3 = mf.bias_dict([shape[3]],'b3')
-            # conv_l3 = mf.conv2d(conv_l1,w3,b3,'conv_l3')
-            # conv_l3 = mf.batch_n(conv_l3,'batch_norm_l3')
-            # # 4th layer
-            # shape = [3,3,8,8]
-            # w4 = mf.weight_dict(shape,'w4')
-            # b4 = mf.bias_dict([shape[3]],'b4')
-            # conv_l4 = mf.conv2d(conv_l3,w4,b4,'conv_l4')
-            # conv_l4 = mf.batch_n(conv_l4,'batch_norm_l4')
-            #
-            # max_pool_2 = mf.max_pool(conv_l4,1,1,'max_pool_bl2')
+            shape = [3,3,4,8]
+            w3 = mf.weight_dict(shape,'w3')
+            b3 = mf.bias_dict([shape[3]],'b3')
+            conv_l3 = mf.conv2d(conv_l1,w3,b3,'conv_l3')
+            conv_l3 = mf.batch_n(conv_l3,'batch_norm_l3')
+            # 4th layer
+            shape = [3,3,8,8]
+            w4 = mf.weight_dict(shape,'w4')
+            b4 = mf.bias_dict([shape[3]],'b4')
+            conv_l4 = mf.conv2d(conv_l3,w4,b4,'conv_l4')
+            conv_l4 = mf.batch_n(conv_l4,'batch_norm_l4')
+
+            max_pool_2 = mf.max_pool(conv_l4,1,1,'max_pool_bl2')
             #               --{3d BLOCK}--
             # 5th layer
-            # shape = [3,3,8,16]
-            # w5 = mf.weight_dict(shape,'w5')
-            # b5 = mf.bias_dict([shape[3]],'b5')
-            # conv_l5 = mf.conv2d(max_pool_2,w5,b5,'conv_l5')
-            # conv_l5 = mf.batch_n(conv_l5,'batch_norm_l5')
+            shape = [3,3,8,16]
+            w5 = mf.weight_dict(shape,'w5')
+            b5 = mf.bias_dict([shape[3]],'b5')
+            conv_l5 = mf.conv2d(max_pool_2,w5,b5,'conv_l5')
+            conv_l5 = mf.batch_n(conv_l5,'batch_norm_l5')
             # 6th layer
-            # shape = [3,3,16,16]
-            # w6 = mf.weight_dict(shape,'w6')
-            # b6 = mf.bias_dict([shape[3]],'b6')
-            # conv_l6 = mf.conv2d(conv_l5,w6,b6,'conv_l6')
-            # conv_l6 = mf.batch_n(conv_l6,'batch_norm_l6')
-            #
-            # max_pool_3 = mf.max_pool(conv_l6,1,1,'max_pool_3')
-            #               --{4th BLOCK}
+            shape = [3,3,16,16]
+            w6 = mf.weight_dict(shape,'w6')
+            b6 = mf.bias_dict([shape[3]],'b6')
+            conv_l6 = mf.conv2d(conv_l5,w6,b6,'conv_l6')
+            conv_l6 = mf.batch_n(conv_l6,'batch_norm_l6')
+
+            max_pool_3 = mf.max_pool(conv_l6,1,1,'max_pool_3')
+            #              --{4th BLOCK}
             # 7th layer
-            # shape = [3,3,16,32]
-            # w7 = mf.weight_dict(shape,'w7')
-            # b7 = mf.bias_dict([shape[3]],'b7')
-            # conv_l7 = mf.conv2d(conv_l5,w7,b7,'conv_l7')
-            # conv_l7 = mf.batch_n(conv_l7,'batch_norm_l7')
-            # 8th layer
-            # shape = [3,3,32,32]
-            # w8 = mf.weight_dict(shape,'w8')
-            # b8 = mf.bias_dict([shape[3]],'b8')
-            # conv_l8 = mf.conv2d(conv_l7,w8,b8,'conv_l8')
-            # conv_l8 = mf.batch_n(conv_l8,'batch_norm_l8')
-            #
-            # max_pool_4 = mf.max_pool(conv_l8,2,2,'max_pool_4')
+            shape = [3,3,16,32]
+            w7 = mf.weight_dict(shape,'w7')
+            b7 = mf.bias_dict([shape[3]],'b7')
+            conv_l7 = mf.conv2d(conv_l5,w7,b7,'conv_l7')
+            conv_l7 = mf.batch_n(conv_l7,'batch_norm_l7')
+            8th layer
+            shape = [3,3,32,32]
+            w8 = mf.weight_dict(shape,'w8')
+            b8 = mf.bias_dict([shape[3]],'b8')
+            conv_l8 = mf.conv2d(conv_l7,w8,b8,'conv_l8')
+            conv_l8 = mf.batch_n(conv_l8,'batch_norm_l8')
+
+            max_pool_4 = mf.max_pool(conv_l8,2,2,'max_pool_4')
             #               --{5th BLOCK}
             # 9th layer
             shape =[3,3,4,64]
             w9 = mf.weight_dict(shape,'w9')
             b9 = mf.bias_dict([shape[3]],'b9')
             conv_l9 = mf.conv2d(conv_l1,w9,b9,'conv_l9')
-            # conv_l9 = mf.batch_n(conv_l9,'batch_norm_l9')
+            conv_l9 = mf.batch_n(conv_l9,'batch_norm_l9')
             # 10th layer
             shape = [3,3,64,64]
             w10 = mf.weight_dict(shape,'w10')
@@ -126,10 +126,10 @@ class CNN(object):
             #           --{FULLY CONNECTED LAYERS}--
             flatt_out = mf.flatten_l(max_pool_5,'flatten_out_layer')
             fc1 = mf.fully_con(flatt_out,256,'fc1')
-            # fc1 = tf.nn.dropout(fc1,self.dropout)
-            # fc2 = mf.fully_con(fc1,512,'fc2')
+            fc1 = tf.nn.dropout(fc1,self.dropout)
+            fc2 = mf.fully_con(fc1,512,'fc2')
 
-            logits = mf.dense_layer(fc1,self.n_classes,'Last_layer')    # last layer not activation function is used for trainning only
+            logits = mf.dense_layer(fc2,self.n_classes,'Last_layer')    # last layer not activation function is used for trainning only
             # logits = mf.outp_layer(fc1,self.n_classes,'Last_layer')
             print('Logits_shape='+str(logits.shape))
         return logits
@@ -257,13 +257,7 @@ class CNN(object):
         n_early_stop_epochs = 16 # Define it
         n_epochs = 30  # Define it
 
-        # # restore variables from previous train session
-        # if(iter>0): restore_variables(sess)
-
-        # create saver object
-        saver = tf.train.Saver()
-        if (iter>0): saver.restore(sess,"../VAR/model.ckpt")
-
+        
         early_stop_counter = 0
 
         # initialize train variables
