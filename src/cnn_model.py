@@ -97,7 +97,7 @@ class CNN(object):
             shape = [3,3,16,32]
             w7 = mf.weight_dict(shape,'w7')
             b7 = mf.bias_dict([shape[3]],'b7')
-            conv_l7 = mf.conv2d(conv_l5,w7,b7,'conv_l7')
+            conv_l7 = mf.conv2d(max_pool_3,w7,b7,'conv_l7')
             conv_l7 = mf.batch_n(conv_l7,'batch_norm_l7')
             8th layer
             shape = [3,3,32,32]
@@ -112,7 +112,7 @@ class CNN(object):
             shape =[3,3,4,64]
             w9 = mf.weight_dict(shape,'w9')
             b9 = mf.bias_dict([shape[3]],'b9')
-            conv_l9 = mf.conv2d(conv_l1,w9,b9,'conv_l9')
+            conv_l9 = mf.conv2d(max_pool_4,w9,b9,'conv_l9')
             conv_l9 = mf.batch_n(conv_l9,'batch_norm_l9')
             # 10th layer
             shape = [3,3,64,64]
@@ -257,7 +257,7 @@ class CNN(object):
         n_early_stop_epochs = 16 # Define it
         n_epochs = 30  # Define it
 
-        
+
         early_stop_counter = 0
 
         # initialize train variables
