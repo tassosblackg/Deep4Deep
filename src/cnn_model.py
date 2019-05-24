@@ -99,7 +99,7 @@ class CNN(object):
             b7 = mf.bias_dict([shape[3]],'b7')
             conv_l7 = mf.conv2d(max_pool_3,w7,b7,'conv_l7')
             conv_l7 = mf.batch_n(conv_l7,'batch_norm_l7')
-            8th layer
+            # 8th layer
             shape = [3,3,32,32]
             w8 = mf.weight_dict(shape,'w8')
             b8 = mf.bias_dict([shape[3]],'b8')
@@ -109,7 +109,7 @@ class CNN(object):
             max_pool_4 = mf.max_pool(conv_l8,2,2,'max_pool_4')
             #               --{5th BLOCK}
             # 9th layer
-            shape =[3,3,4,64]
+            shape =[3,3,32,64]
             w9 = mf.weight_dict(shape,'w9')
             b9 = mf.bias_dict([shape[3]],'b9')
             conv_l9 = mf.conv2d(max_pool_4,w9,b9,'conv_l9')
@@ -205,7 +205,7 @@ class CNN(object):
         total_batches = 0
         # print("TOTAL="+str(self.train_size))
         n_batches = self.train_size / self.batch_size  # ??
-        print(n_batches)
+        # print(n_batches)
         indx=0
         X,Y=mf.shuffling(self.Xtrain_in,self.Ytrain_in)                   # shuffle X ,Y data
         Xbatch,Ybatch,indx=mf.read_nxt_batch(X,Y,self.batch_size,indx)    # take the right batch
@@ -251,19 +251,21 @@ class CNN(object):
         return valid_loss
 
 
-    def train(self,sess,iter):
+    def train(self,sess,iter,saver):
         start_time = time.clock()
 
-        n_early_stop_epochs = 16 # Define it
-        n_epochs = 30  # Define it
+        n_early_stop_epochs = 95 # Define it
+        n_epochs = 130  # Define it
 
 
         early_stop_counter = 0
-
-        # initialize train variables
-        init_op = tf.group(tf.global_variables_initializer())
-
-        sess.run(init_op)
+        if(iter==0):
+            # initialize train variables
+            init_op = tf.group(tf.global_variables_initializer())
+            sess.run(init_op)
+        else:
+            new_saver = tf.train.import_meta_graph('saved_models/model.ckpt.meta')
+            new_saver.restore(sess, tf.train.latest_checkpoint('./saved_models'))
 
         # assign a large value to min
         min_valid_loss = sys.float_info.max
@@ -286,8 +288,9 @@ class CNN(object):
             if valid_loss < min_valid_loss:
                 print('Best epoch=' + str(epoch))
                 # save_variables(sess, saver, epoch, self.model_id)
-                saver_path = saver.save(sess,"../VAR/model.ckpt")
-                print("Model saved in path: %s" % saver_path)
+                # save best epoch ckpt
+                save_path = saver.save(sess,"saved_models/model.ckpt")
+                print("Model saved in path: %s" % save_path)
                 min_valid_loss = valid_loss
                 early_stop_counter = 0
             else:
