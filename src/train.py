@@ -18,7 +18,7 @@ try:
 
     model_id = get_model_id()
     # model_id = read_model_id
-    n_tfiles=300 # how many train files will read per step
+    n_tfiles=600 # how many train files will read per step
     n_vfiles=round(0.567*n_tfiles) # number of  validation files to be read per iter
     # print("a= \n")
     # print(n_vfiles)
@@ -34,20 +34,19 @@ try:
     for i in range(1,total_inp_files,n_tfiles):
     # loop until all data are read
 
-        mf.input(network,n_tfiles,n_vfiles)
+        mf.input(network,n_tfiles,n_vfiles) # read input data
 
         with tf.device('/gpu:0'):
-            # restore()
-            if(iter==0):
-                # Define the train computation graph
-                network.define_train_operations()
 
+            # Define the train computation graph
+            network.define_train_operations()
+            saver = tf.train.Saver()
             # Train the network
             sess = tf.Session(config=tf.ConfigProto(allow_soft_placement = True)) # session with log about gpu exec
             #sess= tf.Session()
             try:
                 print(iter)
-                network.train(sess,iter)
+                network.train(sess,iter,saver)
                 iter += 1
                 flag = 0
                 if(network.kill):break # if overfitting kill loop ??
