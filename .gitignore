@@ -3,6 +3,7 @@ Variables*/
 Variables/
 Variables2/
 Variables3/
+src/saved_models/
 *.pyc
 *.meta
 *.index
