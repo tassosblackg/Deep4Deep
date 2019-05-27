@@ -49,68 +49,92 @@ class CNN(object):
             #               --{1st BLOCK}--
             # 1st layer
             shape = [3,3,1,4] # first layer
-            conv_l1 = mf.conv_layer(X,shape,"conv_l1")
-            conv_l1 = mf.batch_n(conv_l1,'batch_norm_l1')
+            with tf.variable_scope("convolution_layer1",reuse=tf.AUTO_REUSE):
+                conv_l1 = mf.conv_layer(X,shape,"conv_l1")
+            with tf.variable_scope("batch_norm_layer1",reuse=tf.AUTO_REUSE):
+                conv_l1 = mf.batch_n(conv_l1,'batch_norm_l1')
             # 2nd layer
             shape = [3,3,4,4]
-            conv_l2 = mf.conv_layer(conv_l1,shape,'conv_l2')
-            conv_l2 = mf.batch_n(conv_l2,'batch_norm_l2')
+            with tf.variable_scope("convolution_layer2",reuse=tf.AUTO_REUSE):
+                conv_l2 = mf.conv_layer(conv_l1,shape,'conv_l2')
+            with tf.variable_scope("batch_norm_layer2",reuse= tf.AUTO_REUSE):
+                conv_l2 = mf.batch_n(conv_l2,'batch_norm_l2')
 
-            max_pool_1 = mf.max_pool(conv_l2,1,1,'max_pool_bl2')
+            with tf.variable_scope("max-pooling_layer1",reuse= tf.AUTO_REUSE):
+                max_pool_1 = mf.max_pool(conv_l2,1,1,'max_pool_bl2')
 
             #               --{2nd BLOCK}--
             # 3d layer
             shape = [3,3,4,8]
-            conv_l3 = mf.conv_layer(max_pool_1,shape,'conv_l3')
-            conv_l3 = mf.batch_n(conv_l3,'batch_norm_l3')
+            with tf.variable_scope("convolution_layer3",reuse= tf.AUTO_REUSE):
+                conv_l3 = mf.conv_layer(max_pool_1,shape,'conv_l3')
+            with tf.variable_scope("batch_norm_layer3",reuse= tf.AUTO_REUSE):
+                conv_l3 = mf.batch_n(conv_l3,'batch_norm_l3')
             # 4th layer
             shape = [3,3,8,8]
-            conv_l4 = mf.conv_layer(conv_l3,shape,'conv_l4')
-            conv_l4 = mf.batch_n(conv_l4,'batch_norm_l4')
-
-            max_pool_2 = mf.max_pool(conv_l4,1,1,'max_pool_bl2')
+            with tf.variable_scope("convolution_layer4",reuse= tf.AUTO_REUSE):
+                conv_l4 = mf.conv_layer(conv_l3,shape,'conv_l4')
+            with tf.variable_scope("batch_norm_layer4",reuse= tf.AUTO_REUSE):
+                conv_l4 = mf.batch_n(conv_l4,'batch_norm_l4')
+            with tf.variable_scope("max-pooling_layer2",reuse= tf.AUTO_REUSE):
+                max_pool_2 = mf.max_pool(conv_l4,1,1,'max_pool_bl2')
 
             #               --{3d BLOCK}--
             # 5th layer
             shape = [3,3,8,16]
-            conv_l5 = mf.conv_layer(max_pool_2,shape,'conv_l5')
-            conv_l5 = mf.batch_n(conv_l5,'batch_norm_l5')
+            with tf.variable_scope("convolution_layer5",reuse= tf.AUTO_REUSE):
+                conv_l5 = mf.conv_layer(max_pool_2,shape,'conv_l5')
+            with tf.variable_scope("batch_norm_layer5",reuse= tf.AUTO_REUSE):
+                conv_l5 = mf.batch_n(conv_l5,'batch_norm_l5')
             # 6th layer
             shape = [3,3,16,16]
-            conv_l6 = mf.conv_layer(conv_l5,shape,'conv_l6')
-            conv_l6 = mf.batch_n(conv_l6,'batch_norm_l6')
-
-            max_pool_3 = mf.max_pool(conv_l6,1,1,'max_pool_3')
+            with tf.variable_scope("convolution_layer6",reuse= tf.AUTO_REUSE):
+                conv_l6 = mf.conv_layer(conv_l5,shape,'conv_l6')
+            with tf.variable_scope("batch_norm_layer6",reuse= tf.AUTO_REUSE):
+                conv_l6 = mf.batch_n(conv_l6,'batch_norm_l6')
+            with tf.variable_scope("max-pooling_layer3",reuse= tf.AUTO_REUSE):
+                max_pool_3 = mf.max_pool(conv_l6,1,1,'max_pool_3')
             #              --{4th BLOCK}
             # 7th layer
             shape = [3,3,16,32]
-            conv_l7 = mf.conv_layer(max_pool_3,shape,'conv_l7')
-            conv_l7 = mf.batch_n(conv_l7,'batch_norm_l7')
+            with tf.variable_scope("convolution_layer7",reuse= tf.AUTO_REUSE):
+                conv_l7 = mf.conv_layer(max_pool_3,shape,'conv_l7')
+            with tf.variable_scope("batch_norm_layer7",reuse= tf.AUTO_REUSE):
+                conv_l7 = mf.batch_n(conv_l7,'batch_norm_l7')
             # 8th layer
             shape = [3,3,32,32]
-            conv_l8 = mf.conv_layer(conv_l7,shape,'conv_l8')
-            conv_l8 = mf.batch_n(conv_l8,'batch_norm_l8')
-
-            max_pool_4 = mf.max_pool(conv_l8,2,2,'max_pool_4')
+            with tf.variable_scope("convolution_layer8",reuse= tf.AUTO_REUSE):
+                conv_l8 = mf.conv_layer(conv_l7,shape,'conv_l8')
+            with tf.variable_scope("batch_norm_layer8",reuse= tf.AUTO_REUSE):
+                conv_l8 = mf.batch_n(conv_l8,'batch_norm_l8')
+            with tf.variable_scope("max-pooling_layer4",reuse= tf.AUTO_REUSE):
+                max_pool_4 = mf.max_pool(conv_l8,2,2,'max_pool_4')
             #               --{5th BLOCK}
             # 9th layer
             shape =[3,3,32,64]
-            conv_l9 = mf.conv_layer(max_pool_4,shape,'conv_l9')
-            conv_l9 = mf.batch_n(conv_l9,'batch_norm_l9')
+            with tf.variable_scope("convolution_layer9",reuse= tf.AUTO_REUSE):
+                conv_l9 = mf.conv_layer(max_pool_4,shape,'conv_l9')
+            with tf.variable_scope("batch_norm_layer9",reuse= tf.AUTO_REUSE):
+                conv_l9 = mf.batch_n(conv_l9,'batch_norm_l9')
             # 10th layer
             shape = [3,3,64,64]
-            conv_l10 = mf.conv_layer(conv_l9,shape,'conv_l10')
-            conv_l10 = mf.batch_n(conv_l10,'batch_norm_l10')
-
-            max_pool_5 = mf.max_pool(conv_l10,2,2,'max_pool_5')
+            with tf.variable_scope("convolution_layer10",reuse= tf.AUTO_REUSE):
+                conv_l10 = mf.conv_layer(conv_l9,shape,'conv_l10')
+            with tf.variable_scope("batch_norm_layer10",reuse= tf.AUTO_REUSE):
+                conv_l10 = mf.batch_n(conv_l10,'batch_norm_l10')
+            with tf.variable_scope("max-poooling_layer5",reuse= tf.AUTO_REUSE):
+                max_pool_5 = mf.max_pool(conv_l10,2,2,'max_pool_5')
 
             #           --{FULLY CONNECTED LAYERS}--
-            flatt_out = mf.flatten_l(max_pool_5,'flatten_out_layer')
-            fc1 = mf.fully_con(flatt_out,256,'fc1')
-            fc1 = tf.nn.dropout(fc1,self.dropout)
-            fc2 = mf.fully_con(fc1,512,'fc2')
-
-            logits = mf.dense_layer(fc2,self.n_classes,'Last_layer')    # last layer not activation function is used for trainning only
+            with tf.variable_scope("flatt-out_layer3",reuse= tf.AUTO_REUSE):
+                flatt_out = mf.flatten_l(max_pool_5,'flatten_out_layer')
+            with tf.variable_scope("fully_connected_layer1",reuse= tf.AUTO_REUSE):
+                fc1 = mf.fully_con(flatt_out,256,'fc1')
+                fc1 = tf.nn.dropout(fc1,self.dropout)
+            with tf.variable_scope("fully_connected_layer2",reuse= tf.AUTO_REUSE):
+                fc2 = mf.fully_con(fc1,512,'fc2')
+            with tf.variable_scope("Logits-Layer-end",reuse= tf.AUTO_REUSE):
+                logits = mf.dense_layer(fc2,self.n_classes,'Last_layer')    # last layer not activation function is used for trainning only
             # logits = mf.outp_layer(fc1,self.n_classes,'Last_layer')
             print('Logits_shape='+str(logits.shape))
         return logits
