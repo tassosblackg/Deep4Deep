@@ -26,7 +26,7 @@ def conv_layer(inp, shape,name):
     W = weight_dict(shape,(name+'_w'))
     b = bias_dict([shape[3]],(name+'_b'))
     # return(tf.nn.relu(conv2d(inp, W,name) + b))
-    return (conv2d(inp,W,name)+b)
+    return (conv2d(inp,W,b,name))
 
 # batch normalization
 def batch_n(convl,name):
