@@ -42,22 +42,18 @@ class CNN(object):
         self.kill = False
 
 
-    def model_architecture(self, X, keep_prob,reuse=True,is_training=True):
-        with tf.variable_scope("model_architecture", reuse=reuse):
+    def model_architecture(self, X, keep_prob,is_training=True):
+        with tf.variable_scope("model_architecture", reuse=tf.AUTO_REUSE):
             # Reshape input picture
             X = tf.reshape(X, shape=[-1, self.height, self.width, 1])
             #               --{1st BLOCK}--
             # 1st layer
             shape = [3,3,1,4] # first layer
-            w1 = mf.weight_dict(shape,'w1')
-            b1 = mf.bias_dict([shape[3]],'b1')
-            conv_l1 = mf.conv2d(X,w1,b1,'conv_l1')
+            conv_l1 = mf.conv_layer(X,shape,"conv_l1")
             conv_l1 = mf.batch_n(conv_l1,'batch_norm_l1')
             # 2nd layer
             shape = [3,3,4,4]
-            w2 = mf.weight_dict(shape,'w2')
-            b2 = mf.bias_dict([shape[3]],'b2')
-            conv_l2 = mf.conv2d(conv_l1,w2,b2,'conv_l2')
+            conv_l2 = mf.conv_layer(conv_l1,shape,'conv_l2')
             conv_l2 = mf.batch_n(conv_l2,'batch_norm_l2')
 
             max_pool_1 = mf.max_pool(conv_l2,1,1,'max_pool_bl2')
@@ -65,60 +61,45 @@ class CNN(object):
             #               --{2nd BLOCK}--
             # 3d layer
             shape = [3,3,4,8]
-            w3 = mf.weight_dict(shape,'w3')
-            b3 = mf.bias_dict([shape[3]],'b3')
-            conv_l3 = mf.conv2d(conv_l1,w3,b3,'conv_l3')
+            conv_l3 = mf.conv_layer(max_pool_1,shape,'conv_l3')
             conv_l3 = mf.batch_n(conv_l3,'batch_norm_l3')
             # 4th layer
             shape = [3,3,8,8]
-            w4 = mf.weight_dict(shape,'w4')
-            b4 = mf.bias_dict([shape[3]],'b4')
-            conv_l4 = mf.conv2d(conv_l3,w4,b4,'conv_l4')
+            conv_l4 = mf.conv_layer(conv_l3,shape,'conv_l4')
             conv_l4 = mf.batch_n(conv_l4,'batch_norm_l4')
 
             max_pool_2 = mf.max_pool(conv_l4,1,1,'max_pool_bl2')
+
             #               --{3d BLOCK}--
             # 5th layer
             shape = [3,3,8,16]
-            w5 = mf.weight_dict(shape,'w5')
-            b5 = mf.bias_dict([shape[3]],'b5')
-            conv_l5 = mf.conv2d(max_pool_2,w5,b5,'conv_l5')
+            conv_l5 = mf.conv_layer(max_pool_2,shape,'conv_l5')
             conv_l5 = mf.batch_n(conv_l5,'batch_norm_l5')
             # 6th layer
             shape = [3,3,16,16]
-            w6 = mf.weight_dict(shape,'w6')
-            b6 = mf.bias_dict([shape[3]],'b6')
-            conv_l6 = mf.conv2d(conv_l5,w6,b6,'conv_l6')
+            conv_l6 = mf.conv_layer(conv_l5,shape,'conv_l6')
             conv_l6 = mf.batch_n(conv_l6,'batch_norm_l6')
 
             max_pool_3 = mf.max_pool(conv_l6,1,1,'max_pool_3')
             #              --{4th BLOCK}
             # 7th layer
             shape = [3,3,16,32]
-            w7 = mf.weight_dict(shape,'w7')
-            b7 = mf.bias_dict([shape[3]],'b7')
-            conv_l7 = mf.conv2d(max_pool_3,w7,b7,'conv_l7')
+            conv_l7 = mf.conv_layer(max_pool_3,shape,'conv_l7')
             conv_l7 = mf.batch_n(conv_l7,'batch_norm_l7')
             # 8th layer
             shape = [3,3,32,32]
-            w8 = mf.weight_dict(shape,'w8')
-            b8 = mf.bias_dict([shape[3]],'b8')
-            conv_l8 = mf.conv2d(conv_l7,w8,b8,'conv_l8')
+            conv_l8 = mf.conv_layer(conv_l7,shape,'conv_l8')
             conv_l8 = mf.batch_n(conv_l8,'batch_norm_l8')
 
             max_pool_4 = mf.max_pool(conv_l8,2,2,'max_pool_4')
             #               --{5th BLOCK}
             # 9th layer
             shape =[3,3,32,64]
-            w9 = mf.weight_dict(shape,'w9')
-            b9 = mf.bias_dict([shape[3]],'b9')
-            conv_l9 = mf.conv2d(max_pool_4,w9,b9,'conv_l9')
+            conv_l9 = mf.conv_layer(max_pool_4,shape,'conv_l9')
             conv_l9 = mf.batch_n(conv_l9,'batch_norm_l9')
             # 10th layer
             shape = [3,3,64,64]
-            w10 = mf.weight_dict(shape,'w10')
-            b10 = mf.bias_dict([shape[3]],'b10')
-            conv_l10 = mf.conv2d(conv_l9,w10,b10,'conv_l10')
+            conv_l10 = mf.conv_layer(conv_l9,shape,'conv_l10')
             conv_l10 = mf.batch_n(conv_l10,'batch_norm_l10')
 
             max_pool_5 = mf.max_pool(conv_l10,2,2,'max_pool_5')
@@ -137,7 +118,7 @@ class CNN(object):
     # last layer of network is a softmax output
     # apply softmax layer to logits is used for evaluation
     def inference(self,X,keep_prob):
-        return tf.nn.softmax(self.model_architecture(X,keep_prob,reuse=True,is_training=False))
+        return tf.nn.softmax(self.model_architecture(X,keep_prob,reuse=tf.AUTOREUSE,is_training=False))
 
     def define_train_operations(self):
         # set placeholders
@@ -148,7 +129,7 @@ class CNN(object):
         self.Y_train   = tf.placeholder(dtype=tf.int32,shape=(None, self.n_classes), name='Y_train')
 
         # network prediction
-        self.Y_train_predict = self.model_architecture(self.X_train,self.keep_prob,reuse=False)
+        self.Y_train_predict = self.model_architecture(self.X_train,self.keep_prob)
         # calculate training loss between real label and predicted
         self.train_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=self.Y_train_predict, labels=self.Y_train,name='train_loss'))
 
@@ -169,7 +150,7 @@ class CNN(object):
         self.X_valid = tf.placeholder(dtype=tf.float32, shape=(None, self.n_input),name='X_valid')  # Define this
         self.Y_valid = tf.placeholder(dtype=tf.int32, shape=(None,self.n_classes),name='Y_valid')  # Define this
         # logits layer without softmax
-        self.Y_valid_predict = self.model_architecture(self.X_valid,self.keep_prob,reuse=True)
+        self.Y_valid_predict = self.model_architecture(self.X_valid,self.keep_prob)
 
         # Loss on validation
         self.valid_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=self.Y_valid_predict, labels=self.Y_valid,name='valid_loss'))
@@ -254,8 +235,8 @@ class CNN(object):
     def train(self,sess,iter,saver):
         start_time = time.clock()
 
-        n_early_stop_epochs = 95 # Define it
-        n_epochs = 130  # Define it
+        n_early_stop_epochs = 26 # Define it
+        n_epochs = 40  # Define it
 
 
         early_stop_counter = 0
