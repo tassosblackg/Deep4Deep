@@ -19,7 +19,7 @@ def bias_dict(shape,name):
 def conv2d(x, W, b,name,strides=1):
     x = tf.nn.conv2d(x, W, strides=[1, strides, strides, 1], padding='SAME',name=name)
     x = tf.nn.bias_add(x,b)
-    return (x)
+    return (tf.nn.relu(x))
 
 # define convolution layer
 def conv_layer(inp, shape,name):
@@ -30,7 +30,7 @@ def conv_layer(inp, shape,name):
 
 # batch normalization
 def batch_n(convl,name):
-    return (tf.nn.relu(tf.contrib.layers.batch_norm(convl,scale=True)))
+    return (tf.nn.relu(tf.layers.batch_normalization(convl)))
 
 # define max pooling function
 def max_pool(x, strides, k,name):
@@ -51,7 +51,9 @@ def dense_layer(inp, n_outp,name):
     n_features=inp.shape[1].value
     w=weight_dict([n_features,n_outp],(name+'_w'))
     b=bias_dict([n_outp],(name+'_b'))
-    return(tf.matmul(inp,w,name=name)+b)
+    outp=tf.matmul(inp,w,name=name)
+    outp= tf.nn.bias_add(outp,b)
+    return(outp)
 
 #fully_connected layer -- a dense layer that apllies relu function
 def fully_con(inp,n_outp,name):
