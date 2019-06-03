@@ -9,6 +9,7 @@ import tensorflow as tf
 import numpy as np
 from lib.model_io import save_variables
 from lib.model_io import restore_variables
+from lib.model_io import read_model_id
 from lib.precision import _FLOATX
 import read_img as rim
 
@@ -51,14 +52,14 @@ class CNN(object):
             shape = [3,3,1,4] # first layer
             with tf.variable_scope("convolution_layer1",reuse=tf.AUTO_REUSE):
                 conv_l1 = mf.conv_layer(X,shape,"conv_l1")
-            with tf.variable_scope("batch_norm_layer1",reuse=tf.AUTO_REUSE):
-                conv_l1 = mf.batch_n(conv_l1,'batch_norm_l1')
+            # with tf.variable_scope("batch_norm_layer1",reuse=tf.AUTO_REUSE):
+            #     conv_l1 = mf.batch_n(conv_l1,'batch_norm_l1')
             # 2nd layer
             shape = [3,3,4,4]
             with tf.variable_scope("convolution_layer2",reuse=tf.AUTO_REUSE):
                 conv_l2 = mf.conv_layer(conv_l1,shape,'conv_l2')
-            with tf.variable_scope("batch_norm_layer2",reuse= tf.AUTO_REUSE):
-                conv_l2 = mf.batch_n(conv_l2,'batch_norm_l2')
+            # with tf.variable_scope("batch_norm_layer2",reuse= tf.AUTO_REUSE):
+            #     conv_l2 = mf.batch_n(conv_l2,'batch_norm_l2')
 
             with tf.variable_scope("max-pooling_layer1",reuse= tf.AUTO_REUSE):
                 max_pool_1 = mf.max_pool(conv_l2,1,1,'max_pool_bl2')
@@ -68,14 +69,14 @@ class CNN(object):
             shape = [3,3,4,8]
             with tf.variable_scope("convolution_layer3",reuse= tf.AUTO_REUSE):
                 conv_l3 = mf.conv_layer(max_pool_1,shape,'conv_l3')
-            with tf.variable_scope("batch_norm_layer3",reuse= tf.AUTO_REUSE):
-                conv_l3 = mf.batch_n(conv_l3,'batch_norm_l3')
+            # with tf.variable_scope("batch_norm_layer3",reuse= tf.AUTO_REUSE):
+            #     conv_l3 = mf.batch_n(conv_l3,'batch_norm_l3')
             # 4th layer
             shape = [3,3,8,8]
             with tf.variable_scope("convolution_layer4",reuse= tf.AUTO_REUSE):
                 conv_l4 = mf.conv_layer(conv_l3,shape,'conv_l4')
-            with tf.variable_scope("batch_norm_layer4",reuse= tf.AUTO_REUSE):
-                conv_l4 = mf.batch_n(conv_l4,'batch_norm_l4')
+            # with tf.variable_scope("batch_norm_layer4",reuse= tf.AUTO_REUSE):
+            #     conv_l4 = mf.batch_n(conv_l4,'batch_norm_l4')
             with tf.variable_scope("max-pooling_layer2",reuse= tf.AUTO_REUSE):
                 max_pool_2 = mf.max_pool(conv_l4,1,1,'max_pool_bl2')
 
@@ -84,14 +85,14 @@ class CNN(object):
             shape = [3,3,8,16]
             with tf.variable_scope("convolution_layer5",reuse= tf.AUTO_REUSE):
                 conv_l5 = mf.conv_layer(max_pool_2,shape,'conv_l5')
-            with tf.variable_scope("batch_norm_layer5",reuse= tf.AUTO_REUSE):
-                conv_l5 = mf.batch_n(conv_l5,'batch_norm_l5')
+            # with tf.variable_scope("batch_norm_layer5",reuse= tf.AUTO_REUSE):
+            #     conv_l5 = mf.batch_n(conv_l5,'batch_norm_l5')
             # 6th layer
             shape = [3,3,16,16]
             with tf.variable_scope("convolution_layer6",reuse= tf.AUTO_REUSE):
                 conv_l6 = mf.conv_layer(conv_l5,shape,'conv_l6')
-            with tf.variable_scope("batch_norm_layer6",reuse= tf.AUTO_REUSE):
-                conv_l6 = mf.batch_n(conv_l6,'batch_norm_l6')
+            # with tf.variable_scope("batch_norm_layer6",reuse= tf.AUTO_REUSE):
+            #     conv_l6 = mf.batch_n(conv_l6,'batch_norm_l6')
             with tf.variable_scope("max-pooling_layer3",reuse= tf.AUTO_REUSE):
                 max_pool_3 = mf.max_pool(conv_l6,1,1,'max_pool_3')
             #              --{4th BLOCK}
@@ -99,14 +100,14 @@ class CNN(object):
             shape = [3,3,16,32]
             with tf.variable_scope("convolution_layer7",reuse= tf.AUTO_REUSE):
                 conv_l7 = mf.conv_layer(max_pool_3,shape,'conv_l7')
-            with tf.variable_scope("batch_norm_layer7",reuse= tf.AUTO_REUSE):
-                conv_l7 = mf.batch_n(conv_l7,'batch_norm_l7')
+            # with tf.variable_scope("batch_norm_layer7",reuse= tf.AUTO_REUSE):
+            #     conv_l7 = mf.batch_n(conv_l7,'batch_norm_l7')
             # 8th layer
             shape = [3,3,32,32]
             with tf.variable_scope("convolution_layer8",reuse= tf.AUTO_REUSE):
                 conv_l8 = mf.conv_layer(conv_l7,shape,'conv_l8')
-            with tf.variable_scope("batch_norm_layer8",reuse= tf.AUTO_REUSE):
-                conv_l8 = mf.batch_n(conv_l8,'batch_norm_l8')
+            # with tf.variable_scope("batch_norm_layer8",reuse= tf.AUTO_REUSE):
+            #     conv_l8 = mf.batch_n(conv_l8,'batch_norm_l8')
             with tf.variable_scope("max-pooling_layer4",reuse= tf.AUTO_REUSE):
                 max_pool_4 = mf.max_pool(conv_l8,2,2,'max_pool_4')
             #               --{5th BLOCK}
@@ -114,14 +115,14 @@ class CNN(object):
             shape =[3,3,32,64]
             with tf.variable_scope("convolution_layer9",reuse= tf.AUTO_REUSE):
                 conv_l9 = mf.conv_layer(max_pool_4,shape,'conv_l9')
-            with tf.variable_scope("batch_norm_layer9",reuse= tf.AUTO_REUSE):
-                conv_l9 = mf.batch_n(conv_l9,'batch_norm_l9')
+            # with tf.variable_scope("batch_norm_layer9",reuse= tf.AUTO_REUSE):
+            #     conv_l9 = mf.batch_n(conv_l9,'batch_norm_l9')
             # 10th layer
             shape = [3,3,64,64]
             with tf.variable_scope("convolution_layer10",reuse= tf.AUTO_REUSE):
                 conv_l10 = mf.conv_layer(conv_l9,shape,'conv_l10')
-            with tf.variable_scope("batch_norm_layer10",reuse= tf.AUTO_REUSE):
-                conv_l10 = mf.batch_n(conv_l10,'batch_norm_l10')
+            # with tf.variable_scope("batch_norm_layer10",reuse= tf.AUTO_REUSE):
+            #     conv_l10 = mf.batch_n(conv_l10,'batch_norm_l10')
             with tf.variable_scope("max-poooling_layer5",reuse= tf.AUTO_REUSE):
                 max_pool_5 = mf.max_pool(conv_l10,2,2,'max_pool_5')
 
@@ -154,6 +155,7 @@ class CNN(object):
 
         # network prediction
         self.Y_train_predict = self.model_architecture(self.X_train,self.keep_prob)
+
         # calculate training loss between real label and predicted
         self.train_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=self.Y_train_predict, labels=self.Y_train,name='train_loss'))
 
@@ -165,10 +167,10 @@ class CNN(object):
 
         # define the optimization algorithm
         # Define it --shall we try different type of optimizers
-        optimizer = tf.train.AdamOptimizer(learning_rate)
-
-        trainable = tf.trainable_variables()  # may be the weights??
-        self.update_ops = optimizer.minimize(self.train_loss, var_list=trainable, global_step=global_step)
+        optimizer = tf.contrib.optimizer_v2.AdamOptimizer(learning_rate,beta1=0.9, beta2=0.999, epsilon=1e-8,name='training_Adam') #tf.train.AdamOptimizer(learning_rate,beta1=0.9, beta2=0.999, epsilon=1e-8,name='training_Adam')
+        # with tf.variable_scope("training-loss",reuse=reuse):
+        self.trainable = tf.trainable_variables()  # may be the weights  ??
+        self.update_ops = optimizer.minimize(self.train_loss, var_list=self.trainable, global_step=global_step)
 
         # --- Validation computations
         self.X_valid = tf.placeholder(dtype=tf.float32, shape=(None, self.n_input),name='X_valid')  # Define this
@@ -256,21 +258,15 @@ class CNN(object):
         return valid_loss
 
 
-    def train(self,sess,iter,saver):
+    def train(self,sess,iter):
         start_time = time.clock()
 
-        n_early_stop_epochs = 26 # Define it
-        n_epochs = 40  # Define it
+        n_early_stop_epochs = 20 # Define it
+        n_epochs = 25  # Define it
 
 
         early_stop_counter = 0
-        if(iter==0):
-            # initialize train variables
-            init_op = tf.group(tf.global_variables_initializer())
-            sess.run(init_op)
-        else:
-            new_saver = tf.train.import_meta_graph('saved_models/model.ckpt.meta')
-            new_saver.restore(sess, tf.train.latest_checkpoint('./saved_models'))
+
 
         # assign a large value to min
         min_valid_loss = sys.float_info.max
@@ -294,8 +290,10 @@ class CNN(object):
                 print('Best epoch=' + str(epoch))
                 # save_variables(sess, saver, epoch, self.model_id)
                 # save best epoch ckpt
-                save_path = saver.save(sess,"saved_models/model.ckpt")
-                print("Model saved in path: %s" % save_path)
+                # save_path = saver.save(sess,"saved_models/model.ckpt")
+                # print("Model saved in path: %s" % save_path)
+                saver = tf.train.Saver()
+                save_variables(sess,saver,epoch,read_model_id)
                 min_valid_loss = valid_loss
                 early_stop_counter = 0
             else:
