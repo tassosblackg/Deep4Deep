@@ -9,22 +9,26 @@ from lib.model_io import read_model_id
 from tensorflow.python import debug as tf_debug
 import read_img as rim
 import model_func as mf
+import shutil as sh
+
+LOGDIR_train = '../graphs-train'
+LOGDIR_valid = '../graphs-valid'
 
 flag=0
-
 try:
+
     # change this according to your path
     path_to_train_set = "/home/tassos/Desktop/DATA_ASR/ASVspoof2017_V2_train_fbank"
     path_to_valid_set = "/home/tassos/Desktop/DATA_ASR/ASVspoof2017_V2_train_dev"
 
     model_id = get_model_id()
     # model_id = read_model_id
-    n_tfiles=600 # how many train files will read per step
+    n_tfiles=40 # how many train files will read per step
     n_vfiles=round(0.567*n_tfiles) # number of  validation files to be read per iter
 
     # cheat count files number
     total_inp_files = len(os.listdir(path_to_train_set))
-
+    tf.reset_default_graph()
     # Create the network
     network = CNN(model_id)
     iter=0
@@ -34,14 +38,20 @@ try:
 
     with tf.device('/gpu:0'):
 
-        # Define the train computation graph
-        network.define_train_operations()
-        # saver = tf.train.Saver()
-        # Train the network
         sess = tf.Session(config=tf.ConfigProto(allow_soft_placement = True)) # session with log about gpu exec
         # sess = tf_debug.LocalCLIDebugWrapperSession(sess)
+        # Define the train computation graph
+        network.define_train_operations()
+        # remove previous tensorboard  files
+        if (os.path.exists(LOGDIR_train)):
+            sh.rmtree(LOGDIR_train)
+        writer_train = tf.summary.FileWriter(LOGDIR_train, sess.graph)
+        if (os.path.exists(LOGDIR_valid)):
+            sh.rmtree(LOGDIR_valid)
+        writer_valid = tf.summary.FileWriter(LOGDIR_valid)
 
-        # ITerate through input data
+        # # ITerate through input data --\SUBSET\
+
         for i in range(1,total_inp_files,n_tfiles):
         # loop until all data are read
 
@@ -55,14 +65,14 @@ try:
                 # new_saver = tf.train.import_meta_graph('saved_models/model.ckpt.meta')
                 # new_saver.restore(sess, tf.train.latest_checkpoint('./saved_models'))
                 restore_variables(sess)
-            #sess= tf.Session()
 
             print(iter)
-            network.train(sess,iter)
+            network.train(sess,writer_train,writer_valid,iter)
             iter += 1
             flag = 0
-            # if(network.kill):break # if overfitting kill loop ??
+
         sess.close()
+
 except KeyboardInterrupt:
     flag=1
 except Exception as e:
