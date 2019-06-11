@@ -189,7 +189,7 @@ class CNN(object):
 
         # Loss on validation
         self.valid_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=self.Y_valid_predict, labels=self.Y_valid,name='valid_loss'))
-
+        tf.summary.scalar('valid_loss',self.valid_loss)
         # # valid_accuracy
         y_pred_valid = tf.argmax(self.Y_valid_soft,axis=1,output_type=tf.int32)
         y_correct_valid = tf.argmax(self.Y_valid, axis=1, output_type=tf.int32)
@@ -233,7 +233,7 @@ class CNN(object):
         print("Valid_epoch")
         valid_loss = 0
         total_batches = 0
-        print('vddd:'+str(self.valid_size)+'\n')
+        # print('vddd:'+str(self.valid_size)+'\n')
         n_batches = self.valid_size / self.batch_size  # number of elements
         indx=0
         X,Y=mf.shuffling(self.Xvalid_in,self.Yvalid_in)  # shuffle X ,Y data
@@ -259,9 +259,8 @@ class CNN(object):
     def train(self,sess,writer_train,writer_valid,iter):
         start_time = time.clock()
 
-        n_early_stop_epochs = 20 # Define it
+        n_early_stop_epochs = 15 # Define it
         n_epochs = 25  # Define it
-
 
         early_stop_counter = 0
 
@@ -285,7 +284,7 @@ class CNN(object):
             if valid_loss < min_valid_loss:
                 print('Best epoch=' + str(epoch))
                 saver = tf.train.Saver()
-                save_variables(sess,saver,epoch,read_model_id)
+                save_variables(sess,saver,iter,read_model_id)
                 # tf.train.write_graph(sess.graph.as_graph_def(),'../Variables8','tensorflowModel.pbtxt', as_text=True)
                 min_valid_loss = valid_loss
                 early_stop_counter = 0
