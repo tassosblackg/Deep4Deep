@@ -83,7 +83,7 @@ def read_status_upd(file_name,n_files,total_files):
         end_i = start_i+n_files     # ending point
         left_overs=left_overs-n_files
     # save inforamtion of leftovers
-    if (left_overs != 0):
+    if (left_overs >= 0):
         # write left_overs in file for next session
         f = open(read_status_file,"w")
         f.write(str(left_overs))
@@ -193,7 +193,7 @@ def read_stage2(data,labels,total_nframes):
     for l in range(len(data)):
         cframes = data[l].shape[0]  # number of frames per file
         # print(cframes)
-        all_imgs[indx:indx+cframes,:,:,] = data[l]
+        all_imgs[indx:indx+cframes,:,:,] = data[l]                      # list to np array
         all_labels[indx:indx+cframes,:] = labels[l:l+cframes]
         indx +=cframes
 
