@@ -19,25 +19,25 @@ def bias_dict(shape,name):
 def conv2d(x, W, b,name,strides=1):
     x = tf.nn.conv2d(x, W, strides=[1, strides, strides, 1], padding='SAME',name=name)
     x = tf.nn.bias_add(x,b)
-    act = tf.nn.relu(x)
-    tf.summary.histogram('activations',act)
-    return (act)
+    # act = tf.nn.relu(x)
+    # conv_act = tf.summary.histogram('activations',act)
+    return (x)
 
 # define convolution layer
 def conv_layer(inp, shape,name):
     W = weight_dict(shape,(name+'_w'))
     b = bias_dict([shape[3]],(name+'_b'))
     # return(tf.nn.relu(conv2d(inp, W,name) + b))
-    tf.summary.histogram('weights',W)
-    tf.summary.histogram('biases',b)
+    weigth_summ = tf.summary.histogram('weigths',W)
+    bias_summ = tf.summary.histogram('biases',b)
     return (conv2d(inp,W,b,name))
 
 # batch normalization
 def batch_n(convl,name):
     bn = tf.layers.batch_normalization(convl)
     act = tf.nn.relu(bn)
-    tf.summary.histogram('batch-norms',bn)
-    tf.summary.histogram('activations',act)
+    # tf.summary.histogram('batch-norms',bn)
+    bn_act_summ = tf.summary.histogram('activations',act)
     return (act)
 
 # define max pooling function
@@ -60,15 +60,15 @@ def dense_layer(inp, n_outp,name):
     b=bias_dict([n_outp],(name+'_b'))
     outp=tf.matmul(inp,w,name=name)
     outp= tf.nn.bias_add(outp,b)
-    tf.summary.histogram('weights',w)
-    tf.summary.histogram('biases',b)
+    dens_w_summ = tf.summary.histogram('weights',w)
+    dens_b_summ = tf.summary.histogram('biases',b)
     return(outp)
 
 #fully_connected layer -- a dense layer that apllies relu function
 def fully_con(inp,n_outp,name):
     fc=dense_layer(inp,n_outp,(name+'_dl'))
     act = tf.nn.relu(fc,name=(name+'_relu'))
-    tf.summary.histogram('activations',act)
+    fc_act_summ = tf.summary.histogram('activations',act)
     return(act)
 
 #Last Layer -output layer decides a class with a possibility
