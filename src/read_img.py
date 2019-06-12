@@ -70,6 +70,7 @@ def read_status_upd(file_name,n_files,total_files):
     if os.path.exists(read_status_file):
         f = open(read_status_file,"r")
         left_overs = int(f.readline())
+        # print(left_overs)
         f.close()
     else:
         left_overs = total_files    # first read attempt, no files have been read
@@ -78,7 +79,7 @@ def read_status_upd(file_name,n_files,total_files):
     start_i = total_files-left_overs # starting point of loop
     if (left_overs<n_files) :
         end_i = start_i + left_overs
-        left_overs = 0
+        left_overs -= n_files
     else:                           #
         end_i = start_i+n_files     # ending point
         left_overs=left_overs-n_files
@@ -89,6 +90,7 @@ def read_status_upd(file_name,n_files,total_files):
         f.write(str(left_overs))
         f.close()
     else:
+        print('You read it.. " '+read_status_file+' " nothing left..! [ '+str(left_overs)+' ]\n')
         os.remove(read_status_file)
 
     return start_i,end_i
