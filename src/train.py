@@ -23,12 +23,12 @@ try:
 
     model_id = get_model_id()
     # model_id = read_model_id
-    n_tfiles=40 # how many train files will read per step
+    n_tfiles=100 # how many train files will read per step
     n_vfiles=round(0.567*n_tfiles) # number of  validation files to be read per iter
 
     # cheat count files number
     total_inp_files = len(os.listdir(path_to_train_set))
-    tf.reset_default_graph()
+
     # Create the network
     network = CNN(model_id)
     iter=0
@@ -37,11 +37,13 @@ try:
 
 
     with tf.device('/gpu:0'):
-
+        tf.reset_default_graph()
         sess = tf.Session(config=tf.ConfigProto(allow_soft_placement = True)) # session with log about gpu exec
         # sess = tf_debug.LocalCLIDebugWrapperSession(sess)
+
         # Define the train computation graph
         network.define_train_operations()
+
         # remove previous tensorboard  files
         if (os.path.exists(LOGDIR_train)):
             sh.rmtree(LOGDIR_train)
