@@ -27,6 +27,7 @@ class CNN(object):
         # self.Yvalid_in = np.empty(0)
         self.Xeval_in  = np.empty(0)
         self.Yeval_in  = np.empty(0)
+        self.summ_indx = 0
         # model variables
         self.height = 64
         self.width = 17
@@ -140,7 +141,7 @@ class CNN(object):
                 logits = mf.dense_layer(fc2,self.n_classes,'Last_layer')    # last layer not activation function is used for trainning only
             # logits = mf.outp_layer(fc1,self.n_classes,'Last_layer')
             print('Logits_shape='+str(logits.shape))
-            tf.summary.merge_all()
+            # self.merged = tf.summary.merge_all()
         return logits
 
 
@@ -189,7 +190,7 @@ class CNN(object):
 
         # Loss on validation
         self.valid_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=self.Y_valid_predict, labels=self.Y_valid,name='valid_loss'))
-        tf.summary.scalar('valid_loss',self.valid_loss)
+        tf.summary.scalar('valid_loss',self.valid_loss,collections=['VALID'])
         # # valid_accuracy
         y_pred_valid = tf.argmax(self.Y_valid_soft,axis=1,output_type=tf.int32)
         y_correct_valid = tf.argmax(self.Y_valid, axis=1, output_type=tf.int32)
@@ -198,7 +199,7 @@ class CNN(object):
         tf.summary.scalar('valid_acc',self.valid_accuracy,collections=['VALID'])
 
         # # tf.summary.scalar('valid_loss',self.valid_loss)
-        self.summary_op_train = tf.summary.merge_all(key="Training")
+        self.summary_op_train = tf.summary.merge_all(key='Training')
         self.summary_op_valid = tf.summary.merge_all(key='VALID')
 
 
@@ -272,7 +273,7 @@ class CNN(object):
         while (epoch < n_epochs): # max num epoch iteration
             epoch += 1
             epoch_start_time = time.clock()
-
+            self.summ_indx += 1
             train_loss = self.train_epoch(sess) # train_loss on the mini batch
             valid_loss = self.valid_epoch(sess) # valid_loss on the mini batch
             # print("valid ends")
@@ -291,14 +292,16 @@ class CNN(object):
             else:
                 early_stop_counter += 1
 
+            # accuracy and summaries
+            train_acc,s1 = sess.run([self.train_accuracy,self.summary_op_train],feed_dict={self.X_train: self.Xtrain_in,self.Y_train: self.Ytrain_in,self.keep_prob:1.0})
+            valid_acc,s2 = sess.run([self.valid_accuracy,self.summary_op_valid],feed_dict={self.X_valid: self.Xvalid_in,self.Y_valid: self.Yvalid_in,self.keep_prob:1.0})
+            # self.summ = tf.summary.merge_all()
+            writer_train.add_summary(s1,self.summ_indx)
+            # writer_train.add_summary(s,epoch)
+            writer_valid.add_summary(s2,self.summ_indx)
             # evaluate training
             if (epoch % 10 == 0):
-                train_acc,s1 = sess.run([self.train_accuracy,self.summary_op_train],feed_dict={self.X_train: self.Xtrain_in,self.Y_train: self.Ytrain_in,self.keep_prob:1.0})
-                valid_acc,s2 = sess.run([self.valid_accuracy,self.summary_op_valid],feed_dict={self.X_valid: self.Xvalid_in,self.Y_valid: self.Yvalid_in,self.keep_prob:1.0})
-                # self.summ = tf.summary.merge_all()
-                writer_train.add_summary(s1)
-                writer_valid.add_summary(s2)
-                print('[**epoch= '+str(epoch) + ', train_acc ={:.3f}' .format(train_acc)+'valid_acc ={:.3f}'.format(valid_acc) +' **]\n')
+                print('[**epoch= '+str(epoch) + ', train_acc ={:.3f} ' .format(train_acc)+'valid_acc ={:.3f} '.format(valid_acc) +' **]\n')
 
 
             # stop training when overfiiting conditon is true
