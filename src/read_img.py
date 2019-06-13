@@ -97,7 +97,7 @@ def read_status_upd(file_name,n_files,total_files):
 
 # read  n_files .cmp files from a directory and create an array of them
 # plus from a list of labels return a subset according the n_files
-def read_cmp_dir(folder_name,class_types,n_files):
+def read_cmp_dir(folder_name,n_files):
     files = g.glob(dir_n+"/"+folder_name + "/*.cmp")    # read all files from a folder
     total_files = len(files)
     cmp_list = []
@@ -155,7 +155,7 @@ def convert_to_images(params):
 # @class_types  : a list with all labels of data set
 # @n_files      : number of total files to be read
 def read_stage1(dir_name, class_types,n_files):
-    cmp_l = read_cmp_dir(dir_name,class_types,n_files)  # read (#n_files) .cmp files from dir
+    cmp_l = read_cmp_dir(dir_name,n_files)  # read (#n_files) .cmp files from dir
     # class_types to be defined ???
     data_l = []
     labels_per_frames = []
