@@ -321,18 +321,19 @@ class CNN(object):
 
         self.Y_eval = tf.placeholder(dtype=tf.int32, shape=(None, self.n_classes),name='Y_eval')  # Define this
 
-        # self.Y_eval_predict = self.model_architecture(self.X_eval,self.keep_prob,reuse=True,is_training=False) # make a prediction using inference softmax
+        self.Y_eval_predict = self.model_architecture(self.X_eval,self.keep_prob,is_training=False) # make a prediction using inference softmax
         # #Return the index with the largest value across axis
-        # Ypredict = tf.argmax(self.Y_eval_predict, axis=1, output_type=tf.int32) #in [0,1,2]
-        #
+        Ypredict = tf.argmax(self.Y_eval_predict, axis=1, output_type=tf.int32) #in [0,1,2]
+        y_pred_soft = tf.nn.softmax(Ypredict)
         # #Cast a boolean tensor to float32
-        # correct = tf.cast(tf.equal(Ypredict, self.Y_eval), tf.float32)
-        # self.accuracy_graph = tf.reduce_mean(correct)
+        correct = tf.cast(tf.equal(Ypredict, self.Y_eval), tf.float32)
+        self.accuracy_eval = tf.reduce_mean(correct)
     # like train - train epoch
     def predict_utterance(self,sess):
         # initialize variables
-        init = tf.group(tf.global_variables_initializer)
-        sess.run(init)
-        # accuracy=sess.run(self.accuracy_graph, feed_dict={self.X_eval: Xeval_in, self.Y_eval: Yeval_in,self.keep_prob:1.0})
+        # init = tf.group(tf.global_variables_initializer)
+        # sess.run(init)
+        accuracy=sess.run(self.accuracy_graph, feed_dict={self.X_eval: Xeval_in, self.Y_eval: Yeval_in,self.keep_prob:1.0})
+        print('[Loop= '+str()+'eval_accuracy= '+str(accuracy) ' ] '+'\n')
         # return accuracy
-        self.evaluate(sess,True)
+        # self.evaluate(sess,True)
