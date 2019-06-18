@@ -25,19 +25,22 @@ def conv2d(x, W, b,name,strides=1):
 
 # define convolution layer
 def conv_layer(inp, shape,name):
-    W = weight_dict(shape,(name+'_w'))
-    b = bias_dict([shape[3]],(name+'_b'))
+    w_name = (name+'_w')
+    b_name = (name+'_b')
+    W = weight_dict(shape,w_name)
+    b = bias_dict([shape[3]],b_name)
     # return(tf.nn.relu(conv2d(inp, W,name) + b))
-    weigth_summ = tf.summary.histogram('weigths',W)
-    bias_summ = tf.summary.histogram('biases',b)
-    return (conv2d(inp,W,b,name))
+    weigth_summ = tf.summary.histogram(w_name,W,collections=['weigths'])
+    bias_summ = tf.summary.histogram(b_name,b,collections=['biases'])
+    # merged_summ_conv = tf.summary.merge([weigth_summ,bias_summ])
+    return (conv2d(inp,W,b,name),weigth_summ,bias_summ)
 
 # batch normalization
 def batch_n(convl,name):
     bn = tf.layers.batch_normalization(convl)
     act = tf.nn.relu(bn)
     # tf.summary.histogram('batch-norms',bn)
-    bn_act_summ = tf.summary.histogram('activations',act)
+    bn_act_summ = tf.summary.histogram('activations',act,collections=['activations'])
     return (act)
 
 # define max pooling function
@@ -56,19 +59,25 @@ def flatten_l(inp,name):
 #@ n_outp : output dimension-nodes
 def dense_layer(inp, n_outp,name):
     n_features=inp.shape[1].value
-    w=weight_dict([n_features,n_outp],(name+'_w'))
-    b=bias_dict([n_outp],(name+'_b'))
+    w_name = (name+'_w')
+    b_name = (name+'_b')
+    w=weight_dict([n_features,n_outp],w_name)
+    b=bias_dict([n_outp],b_name)
     outp=tf.matmul(inp,w,name=name)
     outp= tf.nn.bias_add(outp,b)
-    dens_w_summ = tf.summary.histogram('weights',w)
-    dens_b_summ = tf.summary.histogram('biases',b)
+    dens_w_summ = tf.summary.histogram(w_name,w,collections=['weights'])
+    dens_b_summ = tf.summary.histogram(b_name,b,collections=['biases'])
+    # merged_summ_dens = tf.summary.merge([dens_w_summ,dens_b_summ])
+    # merged_w = tf.summary.merge(key='weigths')
+    # merged_b = tf.summary.merge(key='biases')
     return(outp)
 
 #fully_connected layer -- a dense layer that apllies relu function
 def fully_con(inp,n_outp,name):
     fc=dense_layer(inp,n_outp,(name+'_dl'))
     act = tf.nn.relu(fc,name=(name+'_relu'))
-    fc_act_summ = tf.summary.histogram('activations',act)
+    fc_act_summ = tf.summary.histogram('activations',act,collections=['activations'])
+    # merged_act = tf.summary.merge(key='activations')
     return(act)
 
 #Last Layer -output layer decides a class with a possibility
