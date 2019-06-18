@@ -144,8 +144,13 @@ class CNN(object):
             # self.merged = tf.summary.merge_all()
         return logits
 
+    def graph_op(self):
+        # branch if true get train operations if false get validation op
+        # greater than zero true, 0 false
+        self.branch_graph = tf.placeholder(dtype=tf.int32,shape=())
+        self.result_t,self.result_v = tf.cond(branch_graph>0,self.train_operations(),self.valid_op())
 
-    def define_train_operations(self):
+    def train_operations(self):
         # set placeholders
         self.keep_prob = tf.placeholder(dtype=tf.float32,name='keep_prob')
 
@@ -159,7 +164,7 @@ class CNN(object):
         # tf.summary.histogram('soft-act',self.Y_train_soft)
 
         # calculate LOSS between real label and predicted
-        self.train_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=self.Y_train_predict, labels=self.Y_train,name='train_loss'))
+        train_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=self.Y_train_predict, labels=self.Y_train,name='train_loss'))
         tf.summary.scalar('train_loss',self.train_loss,collections=['Training'])
 
         # softmax - accuracy
@@ -180,6 +185,12 @@ class CNN(object):
         self.trainable = tf.trainable_variables()  # may be the weights  ??
         self.update_ops = optimizer.minimize(self.train_loss, var_list=self.trainable, global_step=global_step)
 
+        # # tf.summary.scalar('valid_loss',self.valid_loss)
+        self.summary_op_train = tf.summary.merge_all(key='Training')
+
+        return train_loss
+
+    def valid_op(self):
         # # --- Validation computations             ---|VALID|-----
         self.X_valid = tf.placeholder(dtype=tf.float32, shape=(None, self.n_input),name='X_valid')  # Define this
         self.Y_valid = tf.placeholder(dtype=tf.int32, shape=(None,self.n_classes),name='Y_valid')  # Define this
@@ -189,7 +200,7 @@ class CNN(object):
         # tf.summary.histogram('soft-act',self.y_valid_softmax)
 
         # Loss on validation
-        self.valid_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=self.Y_valid_predict, labels=self.Y_valid,name='valid_loss'))
+        valid_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=self.Y_valid_predict, labels=self.Y_valid,name='valid_loss'))
         tf.summary.scalar('valid_loss',self.valid_loss,collections=['VALID'])
         # # valid_accuracy
         y_pred_valid = tf.argmax(self.Y_valid_soft,axis=1,output_type=tf.int32)
@@ -197,12 +208,9 @@ class CNN(object):
         # # # Cast a boolean tensor to float32
         self.valid_accuracy = tf.reduce_mean(tf.cast(tf.equal(y_pred_valid, y_correct_valid), tf.float32))
         tf.summary.scalar('valid_acc',self.valid_accuracy,collections=['VALID'])
-
-        # # tf.summary.scalar('valid_loss',self.valid_loss)
-        self.summary_op_train = tf.summary.merge_all(key='Training')
         self.summary_op_valid = tf.summary.merge_all(key='VALID')
 
-
+        return valid_loss
     # define train actions per epoch
     def train_epoch(self,sess):
         print("Train_epoch")
@@ -216,7 +224,7 @@ class CNN(object):
         Xbatch,Ybatch,indx=mf.read_nxt_batch(X,Y,self.batch_size,indx)    # take the right batch
 
         while Xbatch is not None:     # loop through train batches:
-            mean_loss, _ = sess.run([self.train_loss, self.update_ops], feed_dict={self.X_train: Xbatch ,self.Y_train: Ybatch,self.keep_prob:self.dropout})
+            mean_loss, _ = sess.run([self.result_t, self.update_ops], feed_dict={self.X_train: Xbatch ,self.Y_train: Ybatch,self.keep_prob:self.dropout,self.branch_graph:1})
             Xbatch,Ybatch,indx = mf.read_nxt_batch(X,Y,self.batch_size,indx)
             if math.isnan(mean_loss):
                 print('train cost is NaN')
@@ -243,7 +251,7 @@ class CNN(object):
         # Loop through valid batches:
         while Xbatch is not None  :
             # print("batch_i="+str(total_batches)+"/"+str(n_batches)+"\n")
-            mean_loss = sess.run(self.valid_loss, feed_dict={self.X_valid: Xbatch,self.Y_valid: Ybatch,self.keep_prob:1.0})
+            mean_loss = sess.run(self.result_v, feed_dict={self.X_valid: Xbatch,self.Y_valid: Ybatch,self.keep_prob:1.0,self.branch_graph:0})
             Xbatch,Ybatch,indx = mf.read_nxt_batch(X,Y,self.batch_size,indx)
             if math.isnan(mean_loss):
                 print('valid cost is NaN')
@@ -293,8 +301,8 @@ class CNN(object):
                 early_stop_counter += 1
 
             # accuracy and summaries
-            train_acc,s1 = sess.run([self.train_accuracy,self.summary_op_train],feed_dict={self.X_train: self.Xtrain_in,self.Y_train: self.Ytrain_in,self.keep_prob:1.0})
-            valid_acc,s2 = sess.run([self.valid_accuracy,self.summary_op_valid],feed_dict={self.X_valid: self.Xvalid_in,self.Y_valid: self.Yvalid_in,self.keep_prob:1.0})
+            train_acc,s1 = sess.run([self.train_accuracy,self.summary_op_train],feed_dict={self.X_train: self.Xtrain_in,self.Y_train: self.Ytrain_in,self.keep_prob:1.0,self.branch_graph:1})
+            valid_acc,s2 = sess.run([self.valid_accuracy,self.summary_op_valid],feed_dict={self.X_valid: self.Xvalid_in,self.Y_valid: self.Yvalid_in,self.keep_prob:1.0,self.branch_graph:0})
             # self.summ = tf.summary.merge_all()
             writer_train.add_summary(s1,self.summ_indx)
             # writer_train.add_summary(s,epoch)
