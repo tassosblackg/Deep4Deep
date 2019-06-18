@@ -42,8 +42,9 @@ try:
         # sess = tf_debug.LocalCLIDebugWrapperSession(sess)
 
         # Define the train computation graph
-        network.define_train_operations()
-
+        network.define_graph_op()
+        init_op = tf.group(tf.global_variables_initializer())
+        sess.run(init_op)
         # remove previous tensorboard  files
         if (os.path.exists(LOGDIR_train)):
             sh.rmtree(LOGDIR_train)
@@ -58,11 +59,11 @@ try:
         # loop until all data are read
 
             mf.input(network,n_tfiles,n_vfiles) # read input data
-            if(iter==0):
-                # initialize train variables
-                init_op = tf.group(tf.global_variables_initializer())
-                sess.run(init_op)
-            else:
+            if(iter>0):
+            #     # initialize train variables
+            #     init_op = tf.group(tf.global_variables_initializer())
+            #     sess.run(init_op)
+            # else:
                 # tf.reset_default_graph()
                 # new_saver = tf.train.import_meta_graph('saved_models/model.ckpt.meta')
                 # new_saver.restore(sess, tf.train.latest_checkpoint('./saved_models'))
