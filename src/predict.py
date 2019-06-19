@@ -11,38 +11,47 @@ from tensorflow.python.tools import inspect_checkpoint as chkp
 
 flag=0
 try:
-    path_to_train_set = "/home/tassos/Desktop/DATA_ASR/ASVspoof2017_V2_train_fbank"
-    # path_to_eval_set = "/home/tassos/Desktop/DATA_ASR/ASVspoof2017_V2_train_eval"
-    # total_eval_files = len(os.listdir(path_to_eval_set))
-    total_inp_files = len(os.listdir(path_to_train_set))
+    # path_to_train_set = "/home/tassos/Desktop/DATA_ASR/ASVspoof2017_V2_train_fbank"
+    path_to_eval_set = "/home/tassos/Desktop/DATA_ASR/ASVspoof2017_V2_train_eval"
+    total_eval_files = len(os.listdir(path_to_eval_set))
+    # total_inp_files = len(os.listdir(path_to_train_set))
     model_id = get_model_id()
 
     n_tfiles=550
-    n_vfiles=round(0.25*n_tfiles)
-    # create network
-    model_id = get_model_id()
-    network = CNN(model_id)
-    network.define_predict_operations()
-    # for i in range(0,total_inp_files,n_tfiles):
 
-    mf.input(network,n_tfiles,n_vfiles)
+    iter=0
+
+
+
     with tf.device('/gpu:0'):
-        # with graph.as_default() as graph:
-        saver = tf.train.Saver()
+        tf.reset_default_graph()
+        sess = tf.Session(config=tf.ConfigProto(allow_soft_placement = True)) # session with log about gpu exec
+        # sess = tf_debug.LocalCLIDebugWrapperSession(sess)
 
-        with tf.Session(graph=graph) as sess:
-            saver.restore(sess)
-        #restore_variables(sess) # load last chkp
-        # network.predict_utterance(sess)
-        # network.evaluate(sess)
-        # try:
-        #
-        #     train_acc = self.evaluate(sess,train=True)
-        #     valid_acc = self.evaluate(sess,train=False)
-        #     print('[**  train_acc ={:.3f}' .format(train_acc)+'valid_acc ={:.3f}'.format(valid_acc) +' **]\n')
-        # except Exception as e:
-        #     print('-7-\n')
-        #     traceback.print_exc()
+        # Define the train computation graph
+        network.define_graph_op()
+        init_op = tf.group(tf.global_variables_initializer())
+        sess.run(init_op)
+
+
+        # # ITerate through input data --\SUBSET\
+
+        for i in range(1,total_inp_files,n_tfiles):
+        # loop until all data are read
+
+            # mf.input(network,n_tfiles,n_vfiles) # read input data
+            mf.eval_input(network,n_tfiles)
+            # suppose you've allready run train
+            restore_variables(sess)
+
+            print(iter)
+            # network.train(sess,writer_train,writer_valid,iter)
+            iter += 1
+            flag = 0
+
+        sess.close()
+except KeyboardInterrupt :
+    flag = 1
 except Exception :
     traceback.print_exc()
     flag=1
