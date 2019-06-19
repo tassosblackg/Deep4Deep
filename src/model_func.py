@@ -41,7 +41,7 @@ def batch_n(convl,name):
     act = tf.nn.relu(bn)
     # tf.summary.histogram('batch-norms',bn)
     bn_act_summ = tf.summary.histogram('activations',act,collections=['activations'])
-    return (act)
+    return (act,bn_act_summ)
 
 # define max pooling function
 def max_pool(x, strides, k,name):
@@ -70,7 +70,7 @@ def dense_layer(inp, n_outp,name):
     # merged_summ_dens = tf.summary.merge([dens_w_summ,dens_b_summ])
     # merged_w = tf.summary.merge(key='weigths')
     # merged_b = tf.summary.merge(key='biases')
-    return(outp)
+    return(outp,dens_w_summ,dens_b_summ)
 
 #fully_connected layer -- a dense layer that apllies relu function
 def fully_con(inp,n_outp,name):
@@ -78,7 +78,7 @@ def fully_con(inp,n_outp,name):
     act = tf.nn.relu(fc,name=(name+'_relu'))
     fc_act_summ = tf.summary.histogram('activations',act,collections=['activations'])
     # merged_act = tf.summary.merge(key='activations')
-    return(act)
+    return(act,fc_act_summ)
 
 #Last Layer -output layer decides a class with a possibility
 #args:
