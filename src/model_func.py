@@ -5,6 +5,8 @@ import numpy as np
 # -----------------------------------------------------------------------------------------------------------------
 #                                MODEL ARCHITECTURE FUNCTIONS
 # _________________________________________________________________________________________________________________
+
+list = []
 # define weights
 def weight_dict(shape,name):
     init = tf.truncated_normal(shape, stddev=0.1)
@@ -24,24 +26,29 @@ def conv2d(x, W, b,name,strides=1):
     return (x)
 
 # define convolution layer
-def conv_layer(inp, shape,name):
+def conv_layer(inp, shape,name,summary=False):
     w_name = (name+'_w')
     b_name = (name+'_b')
     W = weight_dict(shape,w_name)
     b = bias_dict([shape[3]],b_name)
     # return(tf.nn.relu(conv2d(inp, W,name) + b))
-    weigth_summ = tf.summary.histogram(w_name,W,collections=['weigths'])
-    bias_summ = tf.summary.histogram(b_name,b,collections=['biases'])
-    # merged_summ_conv = tf.summary.merge([weigth_summ,bias_summ])
-    return (conv2d(inp,W,b,name),weigth_summ,bias_summ)
+    if(summary):
+        weigth_summ = tf.summary.histogram(w_name,W,collections=['weigths'])
+        bias_summ = tf.summary.histogram(b_name,b,collections=['biases'])
+        # merged_summ_conv = tf.summary.merge([weigth_summ,bias_summ])
+        # return (conv2d(inp,W,b,name),weigth_summ,bias_summ)
+        global list.append(weight_dict,bias_summ)
+    return (conv2d(inp,W,b,name))
 
 # batch normalization
-def batch_n(convl,name):
+def batch_n(convl,name,summary=False):
     bn = tf.layers.batch_normalization(convl)
     act = tf.nn.relu(bn)
     # tf.summary.histogram('batch-norms',bn)
-    bn_act_summ = tf.summary.histogram('activations',act,collections=['activations'])
-    return (act,bn_act_summ)
+    if(summary):
+        bn_act_summ = tf.summary.histogram('activations',act,collections=['activations'])
+        global list.append(bn_act_summ)
+    return(act)
 
 # define max pooling function
 def max_pool(x, strides, k,name):
@@ -57,7 +64,7 @@ def flatten_l(inp,name):
 #args:
 #@ inp : input from previous layer
 #@ n_outp : output dimension-nodes
-def dense_layer(inp, n_outp,name):
+def dense_layer(inp, n_outp,name,summary=False):
     n_features=inp.shape[1].value
     w_name = (name+'_w')
     b_name = (name+'_b')
@@ -65,28 +72,38 @@ def dense_layer(inp, n_outp,name):
     b=bias_dict([n_outp],b_name)
     outp=tf.matmul(inp,w,name=name)
     outp= tf.nn.bias_add(outp,b)
-    dens_w_summ = tf.summary.histogram(w_name,w,collections=['weights'])
-    dens_b_summ = tf.summary.histogram(b_name,b,collections=['biases'])
-    # merged_summ_dens = tf.summary.merge([dens_w_summ,dens_b_summ])
-    # merged_w = tf.summary.merge(key='weigths')
-    # merged_b = tf.summary.merge(key='biases')
-    return(outp,dens_w_summ,dens_b_summ)
+    if(summary):
+        dens_w_summ = tf.summary.histogram(w_name,w,collections=['weights'])
+        dens_b_summ = tf.summary.histogram(b_name,b,collections=['biases'])
+        # merged_summ_dens = tf.summary.merge([dens_w_summ,dens_b_summ])
+        # merged_w = tf.summary.merge(key='weigths')
+        # merged_b = tf.summary.merge(key='biases')
+        global list.append(dens_w_summ,dens_b_summ)
+    return(outp,dens_w_summ)
 
 #fully_connected layer -- a dense layer that apllies relu function
-def fully_con(inp,n_outp,name):
-    fc=dense_layer(inp,n_outp,(name+'_dl'))
+def fully_con(inp,n_outp,name,summary=False):
+    fc=dense_layer(inp,n_outp,(name+'_dl'),summary)
     act = tf.nn.relu(fc,name=(name+'_relu'))
-    fc_act_summ = tf.summary.histogram('activations',act,collections=['activations'])
-    # merged_act = tf.summary.merge(key='activations')
-    return(act,fc_act_summ)
+    if(summary):
+        fc_act_summ = tf.summary.histogram('activations',act,collections=['activations'])
+        # merged_act = tf.summary.merge(key='activations')
+        global list.append(fc_act_summ)
+    return(act)
 
-#Last Layer -output layer decides a class with a possibility
-#args:
-#@inp : input tensor from previous layers
-#@n_outp : output nodes --number of classes at output
-def outp_layer(inp,n_outp,name):
-    outp=dense_layer(inp,n_outp,name)
-    return(tf.nn.softmax(outp))
+def merge_summaries():
+    global list
+    l = len(list)
+    i = 0
+    mod = l%3
+    while( l!=0):
+        if(l>=3):
+            merged = tf.summary.merge(list.pop(0),list.pop(0))
+            merged = tf.summary.merge(list.pop(0),merged)
+            l = len(list)   #update l
+        else:
+            if((l%3)):
+    return merged
 
 
 
