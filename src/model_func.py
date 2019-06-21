@@ -6,7 +6,7 @@ import numpy as np
 #                                MODEL ARCHITECTURE FUNCTIONS
 # _________________________________________________________________________________________________________________
 
-list = []
+summ_list = []
 # define weights
 def weight_dict(shape,name):
     init = tf.truncated_normal(shape, stddev=0.1)
@@ -33,11 +33,13 @@ def conv_layer(inp, shape,name,summary=False):
     b = bias_dict([shape[3]],b_name)
     # return(tf.nn.relu(conv2d(inp, W,name) + b))
     if(summary):
-        weigth_summ = tf.summary.histogram(w_name,W,collections=['weigths'])
-        bias_summ = tf.summary.histogram(b_name,b,collections=['biases'])
-        # merged_summ_conv = tf.summary.merge([weigth_summ,bias_summ])
-        # return (conv2d(inp,W,b,name),weigth_summ,bias_summ)
-        global list.append(weight_dict,bias_summ)
+        weight_summ = tf.summary.histogram(w_name,W)
+        bias_summ = tf.summary.histogram(b_name,b)
+        # print(type(bias_summ))
+        global summ_list
+        summ_list.append(weight_summ)
+        summ_list.append(bias_summ)
+        # print(type(summ_list[-1]))
     return (conv2d(inp,W,b,name))
 
 # batch normalization
@@ -46,8 +48,9 @@ def batch_n(convl,name,summary=False):
     act = tf.nn.relu(bn)
     # tf.summary.histogram('batch-norms',bn)
     if(summary):
-        bn_act_summ = tf.summary.histogram('activations',act,collections=['activations'])
-        global list.append(bn_act_summ)
+        bn_act_summ = tf.summary.histogram('activations',act)
+        global summ_list
+        summ_list.append(bn_act_summ)
     return(act)
 
 # define max pooling function
@@ -73,38 +76,30 @@ def dense_layer(inp, n_outp,name,summary=False):
     outp=tf.matmul(inp,w,name=name)
     outp= tf.nn.bias_add(outp,b)
     if(summary):
-        dens_w_summ = tf.summary.histogram(w_name,w,collections=['weights'])
-        dens_b_summ = tf.summary.histogram(b_name,b,collections=['biases'])
-        # merged_summ_dens = tf.summary.merge([dens_w_summ,dens_b_summ])
-        # merged_w = tf.summary.merge(key='weigths')
-        # merged_b = tf.summary.merge(key='biases')
-        global list.append(dens_w_summ,dens_b_summ)
-    return(outp,dens_w_summ)
+        dens_w_summ = tf.summary.histogram(w_name,w)
+        dens_b_summ = tf.summary.histogram(b_name,b)
+        global summ_list
+        summ_list.append(dens_w_summ)
+        summ_list.append(dens_b_summ)
+    return(outp)
 
 #fully_connected layer -- a dense layer that apllies relu function
 def fully_con(inp,n_outp,name,summary=False):
     fc=dense_layer(inp,n_outp,(name+'_dl'),summary)
-    act = tf.nn.relu(fc,name=(name+'_relu'))
+    activ = tf.nn.relu(fc)
     if(summary):
-        fc_act_summ = tf.summary.histogram('activations',act,collections=['activations'])
-        # merged_act = tf.summary.merge(key='activations')
-        global list.append(fc_act_summ)
-    return(act)
+        fc_act_summ = tf.summary.histogram('activations',activ)
+        # print(type(fc_act_summ))
+        global summ_list
+        summ_list.append(fc_act_summ)
+        # print(type(summ_list[-1]))
+    return(activ)
 
-def merge_summaries():
-    global list
-    l = len(list)
-    i = 0
-    mod = l%3
-    while( l!=0):
-        if(l>=3):
-            merged = tf.summary.merge(list.pop(0),list.pop(0))
-            merged = tf.summary.merge(list.pop(0),merged)
-            l = len(list)   #update l
-        else:
-            if((l%3)):
-    return merged
-
+def take_summ_list():
+    global summ_list
+    print(type(summ_list[0]))
+    print(len(summ_list))
+    return (summ_list)
 
 
 # ------------------------------------------------------------------------------------------------------------
