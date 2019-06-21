@@ -54,15 +54,15 @@ class CNN(object):
             # 1st layer
             shape = [3,3,1,4] # first layer
             with tf.variable_scope("convolution_layer1",reuse=tf.AUTO_REUSE):
-                conv_l1,w1,b1 = mf.conv_layer(X,shape,"conv_l1")
+                conv_l1 = mf.conv_layer(X,shape,"conv_l1",True)
             with tf.variable_scope("batch_norm_layer1",reuse=tf.AUTO_REUSE):
-                conv_l1,bn1 = mf.batch_n(conv_l1,'batch_norm_l1')
+                conv_l1 = mf.batch_n(conv_l1,'batch_norm_l1',True)
             # 2nd layer
             shape = [3,3,4,4]
             with tf.variable_scope("convolution_layer2",reuse=tf.AUTO_REUSE):
-                conv_l2,w2,b2 = mf.conv_layer(conv_l1,shape,'conv_l2')
+                conv_l2 = mf.conv_layer(conv_l1,shape,'conv_l2',True)
             with tf.variable_scope("batch_norm_layer2",reuse= tf.AUTO_REUSE):
-                conv_l2,bn2 = mf.batch_n(conv_l2,'batch_norm_l2')
+                conv_l2 = mf.batch_n(conv_l2,'batch_norm_l2',True)
 
             with tf.variable_scope("max-pooling_layer1",reuse= tf.AUTO_REUSE):
                 max_pool_1 = mf.max_pool(conv_l2,1,1,'max_pool_bl2')
@@ -71,15 +71,15 @@ class CNN(object):
             # 3d layer
             shape = [3,3,4,8]
             with tf.variable_scope("convolution_layer3",reuse= tf.AUTO_REUSE):
-                conv_l3,w3,b2 = mf.conv_layer(max_pool_1,shape,'conv_l3')
+                conv_l3 = mf.conv_layer(max_pool_1,shape,'conv_l3',True)
             with tf.variable_scope("batch_norm_layer3",reuse= tf.AUTO_REUSE):
-                conv_l3,bn3 = mf.batch_n(conv_l3,'batch_norm_l3')
+                conv_l3 = mf.batch_n(conv_l3,'batch_norm_l3',True)
             # 4th layer
             shape = [3,3,8,8]
             with tf.variable_scope("convolution_layer4",reuse= tf.AUTO_REUSE):
-                conv_l4,w4,b4 = mf.conv_layer(conv_l3,shape,'conv_l4')
+                conv_l4 = mf.conv_layer(conv_l3,shape,'conv_l4',True)
             with tf.variable_scope("batch_norm_layer4",reuse= tf.AUTO_REUSE):
-                conv_l4,bn4 = mf.batch_n(conv_l4,'batch_norm_l4')
+                conv_l4 = mf.batch_n(conv_l4,'batch_norm_l4',True)
             with tf.variable_scope("max-pooling_layer2",reuse= tf.AUTO_REUSE):
                 max_pool_2 = mf.max_pool(conv_l4,1,1,'max_pool_bl2')
 
@@ -87,45 +87,45 @@ class CNN(object):
             # 5th layer
             shape = [3,3,8,16]
             with tf.variable_scope("convolution_layer5",reuse= tf.AUTO_REUSE):
-                conv_l5,w5,b5 = mf.conv_layer(max_pool_2,shape,'conv_l5')
+                conv_l5 = mf.conv_layer(max_pool_2,shape,'conv_l5',True)
             with tf.variable_scope("batch_norm_layer5",reuse= tf.AUTO_REUSE):
-                conv_l5,bn5 = mf.batch_n(conv_l5,'batch_norm_l5')
+                conv_l5 = mf.batch_n(conv_l5,'batch_norm_l5',True)
             # 6th layer
             shape = [3,3,16,16]
             with tf.variable_scope("convolution_layer6",reuse= tf.AUTO_REUSE):
-                conv_l6,w6,b6 = mf.conv_layer(conv_l5,shape,'conv_l6')
+                conv_l6 = mf.conv_layer(conv_l5,shape,'conv_l6',True)
             with tf.variable_scope("batch_norm_layer6",reuse= tf.AUTO_REUSE):
-                conv_l6,bn6 = mf.batch_n(conv_l6,'batch_norm_l6')
+                conv_l6 = mf.batch_n(conv_l6,'batch_norm_l6',True)
             with tf.variable_scope("max-pooling_layer3",reuse= tf.AUTO_REUSE):
                 max_pool_3 = mf.max_pool(conv_l6,1,1,'max_pool_3')
             #              --{4th BLOCK}
             # 7th layer
             shape = [3,3,16,32]
             with tf.variable_scope("convolution_layer7",reuse= tf.AUTO_REUSE):
-                conv_l7,w7,b7 = mf.conv_layer(max_pool_3,shape,'conv_l7')
+                conv_l7 = mf.conv_layer(max_pool_3,shape,'conv_l7',True)
             with tf.variable_scope("batch_norm_layer7",reuse= tf.AUTO_REUSE):
-                conv_l7,bn7 = mf.batch_n(conv_l7,'batch_norm_l7')
+                conv_l7 = mf.batch_n(conv_l7,'batch_norm_l7')
             # 8th layer
             shape = [3,3,32,32]
             with tf.variable_scope("convolution_layer8",reuse= tf.AUTO_REUSE):
-                conv_l8,w8,b8 = mf.conv_layer(conv_l7,shape,'conv_l8')
+                conv_l8 = mf.conv_layer(conv_l7,shape,'conv_l8',True)
             with tf.variable_scope("batch_norm_layer8",reuse= tf.AUTO_REUSE):
-                conv_l8,bn8 = mf.batch_n(conv_l8,'batch_norm_l8')
+                conv_l8 = mf.batch_n(conv_l8,'batch_norm_l8',True)
             with tf.variable_scope("max-pooling_layer4",reuse= tf.AUTO_REUSE):
                 max_pool_4 = mf.max_pool(conv_l8,2,2,'max_pool_4')
             #               --{5th BLOCK}
             # 9th layer
             shape =[3,3,32,64]
             with tf.variable_scope("convolution_layer9",reuse= tf.AUTO_REUSE):
-                conv_l9,w9,b9 = mf.conv_layer(max_pool_4,shape,'conv_l9')
+                conv_l9 = mf.conv_layer(max_pool_4,shape,'conv_l9',True)
             with tf.variable_scope("batch_norm_layer9",reuse= tf.AUTO_REUSE):
-                conv_l9,bn9 = mf.batch_n(conv_l9,'batch_norm_l9')
+                conv_l9 = mf.batch_n(conv_l9,'batch_norm_l9',True)
             # 10th layer
             shape = [3,3,64,64]
             with tf.variable_scope("convolution_layer10",reuse= tf.AUTO_REUSE):
-                conv_l10,w10,b10 = mf.conv_layer(conv_l9,shape,'conv_l10')
+                conv_l10 = mf.conv_layer(conv_l9,shape,'conv_l10',True)
             with tf.variable_scope("batch_norm_layer10",reuse= tf.AUTO_REUSE):
-                conv_l10,bn10 = mf.batch_n(conv_l10,'batch_norm_l10')
+                conv_l10 = mf.batch_n(conv_l10,'batch_norm_l10',True)
             with tf.variable_scope("max-poooling_layer5",reuse= tf.AUTO_REUSE):
                 max_pool_5 = mf.max_pool(conv_l10,2,2,'max_pool_5')
 
@@ -133,17 +133,16 @@ class CNN(object):
             with tf.variable_scope("flatt-out_layer3",reuse= tf.AUTO_REUSE):
                 flatt_out = mf.flatten_l(max_pool_5,'flatten_out_layer')
             with tf.variable_scope("fully_connected_layer1",reuse= tf.AUTO_REUSE):
-                fc1,act1 = mf.fully_con(flatt_out,256,'fc1')
+                fc1 = mf.fully_con(flatt_out,256,'fc1',True)
                 fc1 = tf.nn.dropout(fc1,keep_prob)
             with tf.variable_scope("fully_connected_layer2",reuse= tf.AUTO_REUSE):
-                fc2,act2 = mf.fully_con(fc1,512,'fc2')
+                fc2 = mf.fully_con(fc1,512,'fc2',True)
             with tf.variable_scope("Logits-Layer-end",reuse= tf.AUTO_REUSE):
-                logits = mf.dense_layer(fc2,self.n_classes,'Last_layer')    # last layer not activation function is used for trainning only
+                logits = mf.dense_layer(fc2,self.n_classes,'Last_layer',True)    # last layer not activation function is used for trainning only
             # logits = mf.outp_layer(fc1,self.n_classes,'Last_layer')
             print('Logits_shape='+str(logits.shape))
             # self.summary_op_train = tf.summary.merge_all()
-            self.summary_op_train = tf.summary.merge([w1,b1,bn1,w2,b2,bn2,w3,b3,bn3,w4,b4,bn4,w5,b5,bn5,w6,b6,bn6,w7,b7,bn7,w8,b8,bn8,
-            w9,b9,bn9,w10,b10,bn10,act1,act2])
+
 
         return logits
 
@@ -187,8 +186,9 @@ class CNN(object):
         optimizer = tf.contrib.optimizer_v2.AdamOptimizer(learning_rate,beta1=0.9, beta2=0.999, epsilon=1e-8,name='training_Adam') #tf.train.AdamOptimizer(learning_rate,beta1=0.9, beta2=0.999, epsilon=1e-8,name='training_Adam')
         self.trainable = tf.trainable_variables()  # may be the weights  ??
         self.update_ops =optimizer.minimize(self.train_loss, var_list=self.trainable, global_step=global_step)
-
-        self.train_graphs = tf.summary.merge([t_los,t_acc])
+        summary_op_train = tf.summary.merge(mf.take_summ_list())
+        train_graphs = tf.summary.merge([t_los,t_acc])
+        self.merged = train_graphs#tf.summary.merge([summary_op_train,train_graphs])
 
 
     def valid_op(self):
@@ -210,7 +210,7 @@ class CNN(object):
         self.valid_accuracy = tf.reduce_mean(tf.cast(tf.equal(y_pred_valid, y_correct_valid), tf.float32))
         v_acc = tf.summary.scalar('valid_acc',self.valid_accuracy,collections=['VALID'])
         # self.summary_op_valid = tf.summary.merge_all(key='VALID')
-        self.valid_graphs = tf.summary.merge([v_los,t_acc])
+        self.valid_graphs = tf.summary.merge([v_los,v_acc])
         # return valid_loss
 
     # define train actions per epoch
@@ -303,23 +303,23 @@ class CNN(object):
                 early_stop_counter += 1
 
             # accuracy and summaries
-            h = sess.partial_run_setup([self.train_accuracy,self.summary_op_train,self.train_graphs],[self.X_train,self.Y_train,self.keep_prob])
-            t_acc,res2,res3 = sess.partial_run(h,[self.train_accuracy,self.summary_op_train,self.train_graphs],feed_dict={self.X_train: self.Xtrain_in,self.Y_train: self.Ytrain_in,self.keep_prob:1.0})
+            h = sess.partial_run_setup([self.train_accuracy,self.merged],[self.X_train,self.Y_train,self.keep_prob])
+            t_acc,res = sess.partial_run(h,[self.train_accuracy,self.merged],feed_dict={self.X_train: self.Xtrain_in,self.Y_train: self.Ytrain_in,self.keep_prob:1.0})
 
             # = sess.partial_run(h,self.summary_op_train,feed_dict={self.X_train: self.Xtrain_in,self.Y_train: self.Ytrain_in,self.keep_prob:1.0})
             # train_acc,s1 = sess.run([self.train_accuracy,self.summary_op_train],feed_dict={self.X_train: self.Xtrain_in,self.Y_train: self.Ytrain_in,self.keep_prob:1.0,self.branch_graph:1})
             # valid_acc,s2 = sess.run([self.valid_accuracy,self.summary_op_valid],feed_dict={self.X_valid: self.Xvalid_in,self.Y_valid: self.Yvalid_in,self.keep_prob:1.0,self.branch_graph:0})
             # # self.summ = tf.summary.merge_all()
-            writer_train.add_summary(res2,self.summ_indx)
-            writer_train.add_summary(res3,self.summ_indx)
+            writer_train.add_summary(res,self.summ_indx)
+            # writer_train.add_summary(res3,self.summ_indx)
             writer_train.flush()
-            h2 = sess.partial_run_setup([self.valid_accuracy,self.valid_graphs],[self.X_valid,self.Y_valid,self.keep_prob])
-            v_acc,s = sess.partial_run(h,[self.valid_accuracy,self.valid_graphs],feed_dict={self.X_valid: self.Xvalid_in,self.Y_valid: self.Yvalid_in,self.keep_prob:1.0})
-            writer_valid.add_summary(s,self.summ_indx)
-            writer_valid.flush()
+            # h2 = sess.partial_run_setup([self.valid_accuracy,self.valid_graphs],[self.X_valid,self.Y_valid,self.keep_prob])
+            # v_acc,s = sess.partial_run(h,[self.valid_accuracy,self.valid_graphs],feed_dict={self.X_valid: self.Xvalid_in,self.Y_valid: self.Yvalid_in,self.keep_prob:1.0})
+            # writer_valid.add_summary(s,self.summ_indx)
+            # writer_valid.flush()
             # # evaluate training
             if (epoch % 10 == 0):
-                print('[**epoch= '+str(epoch) + ', train_acc ={:.3f} ' .format(t_acc)+'valid_acc ={:.3f} '.format(v_acc) +' **]\n')
+                print('[**epoch= '+str(epoch) + ', train_acc ={:.3f} ' .format(t_acc)+ ' **]\n')
 
 
             # stop training when overfiiting conditon is true
