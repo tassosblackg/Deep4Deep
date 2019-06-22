@@ -5,6 +5,7 @@ Variables2/
 Variables3/
 Variables6/
 Variables7/
+graphs-*/
 src/saved_models/
 *.pyc
 *.meta
