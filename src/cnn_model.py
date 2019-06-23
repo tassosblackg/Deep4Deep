@@ -35,7 +35,7 @@ class CNN(object):
         self.n_input = self.height * self.width*self.chan # 64x17x1
         self.n_classes = 2      # genuine or spoof --number of classes
         self.dropout = 0.75     # dropout probality
-        self.batch_size = 256   # 64 || 128 || 256
+        self.batch_size = 512   # 64 || 128 || 256
         self.train_size = 0
         self.valid_size = 0
         self.eval_size = 0
@@ -303,8 +303,8 @@ class CNN(object):
                 early_stop_counter += 1
 
             # accuracy and summaries
-            h = sess.partial_run_setup([self.train_accuracy,self.merged],[self.X_train,self.Y_train,self.keep_prob])
-            t_acc,res = sess.partial_run(h,[self.train_accuracy,self.merged],feed_dict={self.X_train: self.Xtrain_in,self.Y_train: self.Ytrain_in,self.keep_prob:1.0})
+            # h = sess.partial_run_setup([self.train_accuracy,self.merged],[self.X_train,self.Y_train,self.keep_prob])
+            t_acc,res = sess.run([self.train_accuracy,self.merged],feed_dict={self.X_train: self.Xtrain_in,self.Y_train: self.Ytrain_in,self.keep_prob:1.0})
 
             # = sess.partial_run(h,self.summary_op_train,feed_dict={self.X_train: self.Xtrain_in,self.Y_train: self.Ytrain_in,self.keep_prob:1.0})
             # train_acc,s1 = sess.run([self.train_accuracy,self.summary_op_train],feed_dict={self.X_train: self.Xtrain_in,self.Y_train: self.Ytrain_in,self.keep_prob:1.0,self.branch_graph:1})
@@ -312,14 +312,14 @@ class CNN(object):
             # # self.summ = tf.summary.merge_all()
             writer_train.add_summary(res,self.summ_indx)
             # writer_train.add_summary(res3,self.summ_indx)
-            writer_train.flush()
+            # writer_train.flush()
             # h2 = sess.partial_run_setup([self.valid_accuracy,self.valid_graphs],[self.X_valid,self.Y_valid,self.keep_prob])
-            # v_acc,s = sess.partial_run(h,[self.valid_accuracy,self.valid_graphs],feed_dict={self.X_valid: self.Xvalid_in,self.Y_valid: self.Yvalid_in,self.keep_prob:1.0})
-            # writer_valid.add_summary(s,self.summ_indx)
+            v_acc,s = sess.run([self.valid_accuracy,self.valid_graphs],feed_dict={self.X_valid: self.Xvalid_in,self.Y_valid: self.Yvalid_in,self.keep_prob:1.0})
+            writer_valid.add_summary(s,self.summ_indx)
             # writer_valid.flush()
             # # evaluate training
             if (epoch % 10 == 0):
-                print('[**epoch= '+str(epoch) + ', train_acc ={:.3f} ' .format(t_acc)+ ' **]\n')
+                print('[**epoch= '+str(epoch) + ', train_acc ={:.3f} ' .format(t_acc)+', valid_acc ={:.3f} ' .format(v_acc) + ' **]\n')
 
 
             # stop training when overfiiting conditon is true
