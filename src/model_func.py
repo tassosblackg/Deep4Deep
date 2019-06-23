@@ -106,13 +106,18 @@ def take_summ_list():
 #                                   INPUT DATA PROCESSING
 #_____________________________________________________________________________________________________________
 # DATA preprocessing operations
-# normalize input data
+# normalize min-max input data
 def normalize( X):
     col_max = np.max(X, axis=0)
     col_min = np.min(X, axis=0)
     normX = np.divide(X - col_min, col_max - col_min)
     return normX
 
+#normalize using mean -stddev
+def normlaize_elm_wise(X,mean,dev):
+    normX= (X-mean) / devX
+    return normX
+    
 # read input data
 def input(network,n_tfiles,n_vfiles):
     # Xtrain_in,Ytrain_in : list of ndarray
