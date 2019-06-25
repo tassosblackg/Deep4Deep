@@ -234,5 +234,11 @@ def read_Data(dir_name, info_file,n_files):
     return(reshaped_data,np_labels,total_frames)
 
 
+# first attempt for read prediction data
+def read_pred_data(dir_name,info_file):
+    image,label,nframes = read_Data(dir_name,info_file,1) # read only one file
+    droped_frames_image = image[0:63,:]
+    droped_labels = label[0:63,:]
+    return(droped_frames_image,droped_labels,64)
 
 # ------------------------------------------------------------------------------
