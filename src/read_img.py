@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 # very IMPORTANT to define the path ,dir_n
 # check your project directories
 
-path = "../protocol_V2"               # check and define it properly
+path = "/home/tassos/Desktop/SpeechR2/Deep4Deep/protocol_V2"               # check and define it properly
 dir_n="/home/tassos/Desktop/DATA_ASR" # check and define where is your DATA dir
 
 # read if .wav file is genuine or spoof --create label
@@ -237,8 +237,8 @@ def read_Data(dir_name, info_file,n_files):
 # first attempt for read prediction data
 def read_pred_data(dir_name,info_file):
     image,label,nframes = read_Data(dir_name,info_file,1) # read only one file
-    droped_frames_image = image[0:63,:]
-    droped_labels = label[0:63,:]
+    droped_frames_image = image[:64,:]
+    droped_labels = label[:64,:]
     return(droped_frames_image,droped_labels,64)
 
 # ------------------------------------------------------------------------------
