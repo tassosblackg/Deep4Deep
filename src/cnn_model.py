@@ -342,16 +342,35 @@ class CNN(object):
         self.Y_eval_predict = self.model_architecture(self.X_eval,self.keep_prob,is_training=False) # make a prediction using inference softmax
         # #Return the index with the largest value across axis
         Ypredict = tf.argmax(self.Y_eval_predict, axis=1, output_type=tf.int32) #in [0,1,2]
-        y_pred_soft = tf.nn.softmax(Ypredict)
+        # y_pred_soft = tf.nn.softmax(Ypredict)
+        # log with softmax one step
+        self.y_pred_logsoft = tf.nn.log_softmax(Ypredict)
         # #Cast a boolean tensor to float32
         correct = tf.cast(tf.equal(Ypredict, self.Y_eval), tf.float32)
         self.accuracy_eval = tf.reduce_mean(correct)
+        self.merged = tf.summary.scalar('eval_acc',self.accuracy_eval)
+
+    #take classification decision
+    def make_decision(self,class_list):
+        sum_per_col = tf.math.reduce_sum(self.y_pred_logsoft,axis=0)
+        if(tf.math.greater_equal(sum_per_col[0],sum_per_col[1])):
+            class_list.append('spoof')
+            spoof_counter+=1
+        else:
+            class_list.append('genuine')
+            genuine_counter+=1
+
+        return class_list
+    # compare prediction with true label
+    def calc_f1_score(self):
+        pass
     # like train - train epoch
-    def predict_utterance(self,sess):
+    def predict_utterance(self,sess,writer,indx):
         # initialize variables
         # init = tf.group(tf.global_variables_initializer)
         # sess.run(init)
-        accuracy=sess.run(self.accuracy_graph, feed_dict={self.X_eval: Xeval_in, self.Y_eval: Yeval_in,self.keep_prob:1.0})
+        accuracy,summ=sess.run([self.accuracy_eval,self.merged] feed_dict={self.X_eval: Xeval_in, self.Y_eval: Yeval_in,self.keep_prob:1.0})
+        writer.add_summary(summ,indx)
         # print('[Loop= '+str()+'eval_accuracy= '+str(accuracy) ' ] '+'\n')
         # return accuracy
         # self.evaluate(sess,True)
