@@ -117,7 +117,7 @@ def normalize( X):
 def normlaize_elm_wise(X,mean,dev):
     normX= (X-mean) / devX
     return normX
-    
+
 # read input data
 def input(network,n_tfiles,n_vfiles):
     # Xtrain_in,Ytrain_in : list of ndarray
@@ -131,7 +131,8 @@ def input(network,n_tfiles,n_vfiles):
 
 # read eval dataset
 def eval_input(network,n_efiles):
-    network.Xeval_in, network.Yeval_in, network.eval_size = rim.read_Data('ASVspoof2017_V2_train_eval','eval_info.txt',n_efiles)
+    network.Xeval_in, network.Yeval_in, network.eval_size = rim.read_pred_data('ASVspoof2017_V2_train_eval','eval_info.txt')
+    #rim.read_Data('ASVspoof2017_V2_train_eval','eval_info.txt',n_efiles)
     # Normalize
     network.Xeval_in = normalize(network.Xeval_in)
 
