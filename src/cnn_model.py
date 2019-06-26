@@ -347,7 +347,7 @@ class CNN(object):
         self.y_pred_logsoft = tf.nn.log_softmax(Ypredict)
         # #Cast a boolean tensor to float32
         correct = tf.cast(tf.equal(Ypredict, self.Y_eval), tf.float32)
-        self.accuracy_eval = tf.reduce_mean(correct)
+        self.accuracy_eval = tf.reduce_mean(correct) #test set accuracy calculate
         self.merged = tf.summary.scalar('eval_acc',self.accuracy_eval)
 
     #take classification decision
@@ -371,6 +371,8 @@ class CNN(object):
         # sess.run(init)
         accuracy,summ=sess.run([self.accuracy_eval,self.merged] feed_dict={self.X_eval: Xeval_in, self.Y_eval: Yeval_in,self.keep_prob:1.0})
         writer.add_summary(summ,indx)
+        self.make_decision()
+
         # print('[Loop= '+str()+'eval_accuracy= '+str(accuracy) ' ] '+'\n')
         # return accuracy
         # self.evaluate(sess,True)
