@@ -97,8 +97,8 @@ def fully_con(inp,n_outp,name,summary=False):
 
 def take_summ_list():
     global summ_list
-    print(type(summ_list[0]))
-    print(len(summ_list))
+    # print(type(summ_list[0]))
+    # print(len(summ_list))
     return (summ_list)
 
 
