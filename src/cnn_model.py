@@ -27,7 +27,14 @@ class CNN(object):
         # self.Yvalid_in = np.empty(0)
         self.Xeval_in  = np.empty(0)
         self.Yeval_in  = np.empty(0)
+        self.class_list = []
         self.summ_indx = 0
+        self.true_pos = 0
+        self.true_neg = 0
+        self.false_neg = 0
+        self.false_pos = 0
+        self.genuine_counter = 0
+        self.spoof_counter = 0
         # model variables
         self.height = 64
         self.width = 17
@@ -342,37 +349,59 @@ class CNN(object):
         self.Y_eval_predict = self.model_architecture(self.X_eval,self.keep_prob,is_training=False) # make a prediction using inference softmax
         # #Return the index with the largest value across axis
         Ypredict = tf.argmax(self.Y_eval_predict, axis=1, output_type=tf.int32) #in [0,1,2]
+        Ycorrect = tf.argmax(self.Y_eval, axis=1, output_type=tf.int32)
         # y_pred_soft = tf.nn.softmax(Ypredict)
+
         # log with softmax one step
-        self.y_pred_logsoft = tf.nn.log_softmax(Ypredict)
-        # #Cast a boolean tensor to float32
-        correct = tf.cast(tf.equal(Ypredict, self.Y_eval), tf.float32)
+        self.y_pred_logsoft = tf.nn.log_softmax(self.Y_eval_predict,axis=1)#tf.nn.softmax(tf.cast(Ypredict,tf.float32))
+
+        # Cast a boolean tensor to float32
+        correct = tf.cast(tf.equal(Ypredict,Ycorrect), tf.float32)
         self.accuracy_eval = tf.reduce_mean(correct) #test set accuracy calculate
         self.merged = tf.summary.scalar('eval_acc',self.accuracy_eval)
 
     #take classification decision
-    def make_decision(self,class_list):
-        sum_per_col = tf.math.reduce_sum(self.y_pred_logsoft,axis=0)
-        if(tf.math.greater_equal(sum_per_col[0],sum_per_col[1])):
-            class_list.append('spoof')
-            spoof_counter+=1
+    def make_decision(self,y):
+        sum_per_col = np.sum(y,axis=0)
+        # print(sum_per_col)
+        if(np.greater_equal(sum_per_col[0],sum_per_col[1])): # if true, then spoof label
+            self.class_list.append(0)
+            self.spoof_counter+=1    #
         else:
-            class_list.append('genuine')
-            genuine_counter+=1
+            self.class_list.append(1)
+            self.genuine_counter+=1
+        #print(len(self.class_list))
 
-        return class_list
-    # compare prediction with true label
-    def calc_f1_score(self):
-        pass
+    # compare prediction with true label,count sets
+    def calc_f1_sets(self):
+        if(np.array_equal(self.Yeval_in[0,:],[0.,.1])): #label is genuine
+            l=1
+        else: #label is spoof
+            l=0
+        if(self.class_list[-1]==l): #compare last element
+            if(l==0):
+                self.true_neg+=1
+            else:
+                self.true_pos+=1
+        else:
+            if(l==0):
+                self.false_pos+=1
+            else:
+                self.false_neg+=1
+
+    #final calculation of F1 score,binary classification
+    def f1_score(self):
+        precision = self.true_pos/(self.true_pos+self.false_pos)
+        recall = self.true_pos/(self.true_pos+self.false_neg)
+        denominator = 1/precision + 1/recall
+        return(2/denominator)
+
     # like train - train epoch
     def predict_utterance(self,sess,writer,indx):
-        # initialize variables
-        # init = tf.group(tf.global_variables_initializer)
-        # sess.run(init)
-        accuracy,summ=sess.run([self.accuracy_eval,self.merged] feed_dict={self.X_eval: Xeval_in, self.Y_eval: Yeval_in,self.keep_prob:1.0})
+        accuracy,summ,y_pred=sess.run([self.accuracy_eval,self.merged,self.y_pred_logsoft], feed_dict={self.X_eval: self.Xeval_in, self.Y_eval: self.Yeval_in,self.keep_prob:1.0})
+        print('BAKA')
+        # print(y_pred)
+        # print(y_pred.shape)
+        # print(type(y_pred))
+        self.make_decision(y_pred)
         writer.add_summary(summ,indx)
-        self.make_decision()
-
-        # print('[Loop= '+str()+'eval_accuracy= '+str(accuracy) ' ] '+'\n')
-        # return accuracy
-        # self.evaluate(sess,True)
