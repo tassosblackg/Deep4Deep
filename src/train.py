@@ -23,7 +23,7 @@ try:
 
     model_id = get_model_id()
     # model_id = read_model_id
-    n_tfiles=100 # how many train files will read per step
+    n_tfiles=80 # how many train files will read per step
     n_vfiles=round(0.567*n_tfiles) # number of  validation files to be read per iter
 
     # cheat count files number
