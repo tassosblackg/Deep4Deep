@@ -9,19 +9,21 @@ import read_img as ri
 
 print('\n')
 
-sub_labels = ri.read_subset_labels('train_info.txt',2600)
+sub_labels = ri.read_subset_labels('eval_info.txt',4)
 print(sub_labels)
 print('\n')
 ohe = ri.one_hot_encode(sub_labels)
 print(ohe)
-a = np.empty(0)
-a=[[0. ,1.]]
-# b= np.empty(0)
-# b.append([1., 0.])
-print('Tuple\n')
-print(ohe[2,:])
-
-if (np.array_equal(ohe[0,:],[0.,1.])):
-    print('1')
-else:
-    print('0')
+print('baka\n')
+print(np.argmax(ohe,axis=1))
+# a = np.empty(0)
+# a=[[0. ,1.]]
+# # b= np.empty(0)
+# # b.append([1., 0.])
+# print('Tuple\n')
+# print(ohe[2,:])
+#
+# if (np.array_equal(ohe[0,:],[0.,1.])):
+#     print('1')
+# else:
+#     print('0')
