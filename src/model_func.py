@@ -72,24 +72,32 @@ def outp_layer(inp,n_outp,name):
 #                                   INPUT DATA PROCESSING
 #_____________________________________________________________________________________________________________
 # DATA preprocessing operations
-# normalize input data
+# standarization or scaling input data
 def normalize( X):
     col_max = np.max(X, axis=0)
     col_min = np.min(X, axis=0)
     normX = np.divide(X - col_min, col_max - col_min)
     return normX
 
+# use train data statistics to normalize
+def mean_normalization(x,m,std):
+    return ((X-m)/std)
+
+
 # read input data
 def input(network,n_tfiles,n_vfiles):
     # Xtrain_in,Ytrain_in : list of ndarray
     network.Xtrain_in, network.Ytrain_in, network.train_size = rim.read_Data("ASVspoof2017_V2_train_fbank", "train_info.txt",n_tfiles)  # Read Train data
+    network.mean =  np.mean(network.Xtrain_in)
+    network.std  =  np.std(network.Xtrain_in)
     # Normalize input train set data
-    network.Xtrain_in = normalize(network.Xtrain_in)
+    # network.Xtrain_in = normalize(network.Xtrain_in)
+    network.Xtrain_in = mean_normalization(network.Xtrain_in,network.mean,network.std)
     # read valiation data
     network.Xvalid_in, network.Yvalid_in, network.dev_size = rim.read_Data("ASVspoof2017_V2_train_dev", "dev_info.txt",n_vfiles)         # Read validation data
     # # Normalize input validation set data
-    network.Xvalid_in = normalize(network.Xvalid_in)
-
+    # network.Xvalid_in = normalize(network.Xvalid_in)
+    network.Xvalid_in = mean_normalization(network.Xvalid_in,network.mean,network.std)
 
 # shuffle index so to get with random order the data
 def shuffling( X,Y):

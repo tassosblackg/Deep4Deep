@@ -24,7 +24,8 @@ class CNN(object):
         self.Ytrain_in = np.empty(0)
         self.Xvalid_in = np.empty(0)
         self.Yvalid_in = np.empty(0)
-
+        self.mean = 0
+        self.std = 0
         # model variables
         self.height = 64
         self.width = 17
