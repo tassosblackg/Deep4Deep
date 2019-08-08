@@ -25,6 +25,8 @@ class CNN(object):
         self.Ytrain_in = np.empty(0)
         # self.Xvalid_in = np.empty(0)
         # self.Yvalid_in = np.empty(0)
+        self.mean = 0
+        self.std = 0
         self.Xeval_in  = np.empty(0)
         self.Yeval_in  = np.empty(0)
         self.class_list = []
@@ -310,24 +312,14 @@ class CNN(object):
                 early_stop_counter += 1
 
             # accuracy and summaries
-            # h = sess.partial_run_setup([self.train_accuracy,self.merged],[self.X_train,self.Y_train,self.keep_prob])
             t_acc,res = sess.run([self.train_accuracy,self.merged],feed_dict={self.X_train: self.Xtrain_in,self.Y_train: self.Ytrain_in,self.keep_prob:1.0})
-
-            # = sess.partial_run(h,self.summary_op_train,feed_dict={self.X_train: self.Xtrain_in,self.Y_train: self.Ytrain_in,self.keep_prob:1.0})
-            # train_acc,s1 = sess.run([self.train_accuracy,self.summary_op_train],feed_dict={self.X_train: self.Xtrain_in,self.Y_train: self.Ytrain_in,self.keep_prob:1.0,self.branch_graph:1})
-            # valid_acc,s2 = sess.run([self.valid_accuracy,self.summary_op_valid],feed_dict={self.X_valid: self.Xvalid_in,self.Y_valid: self.Yvalid_in,self.keep_prob:1.0,self.branch_graph:0})
-            # # self.summ = tf.summary.merge_all()
             writer_train.add_summary(res,self.summ_indx)
-            # writer_train.add_summary(res3,self.summ_indx)
-            # writer_train.flush()
-            # h2 = sess.partial_run_setup([self.valid_accuracy,self.valid_graphs],[self.X_valid,self.Y_valid,self.keep_prob])
+
             v_acc,s = sess.run([self.valid_accuracy,self.valid_graphs],feed_dict={self.X_valid: self.Xvalid_in,self.Y_valid: self.Yvalid_in,self.keep_prob:1.0})
             writer_valid.add_summary(s,self.summ_indx)
-            # writer_valid.flush()
             # # evaluate training
             if (epoch % 10 == 0):
                 print('[**epoch= '+str(epoch) + ', train_acc ={:.3f} ' .format(t_acc)+', valid_acc ={:.3f} ' .format(v_acc) + ' **]\n')
-
 
             # stop training when overfiiting conditon is true
             if early_stop_counter > n_early_stop_epochs:
