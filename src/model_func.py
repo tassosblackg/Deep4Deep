@@ -113,12 +113,16 @@ def normalize( X):
     normX = np.divide(X - col_min, col_max - col_min)
     return normX
 
-#normalize using mean -stddev
-def normlaize_elm_wise(X,mean,dev):
-    normX= (X-mean) / devX
-    return normX
+# returns splited line as string
+def read_statistics():
+    f = open('statistics','r')
+    line = f.readline()
+    line = line.split(',')
+
+    return line
+
 # use train data statistics to normalize
-def mean_normalization(x,m,std):
+def mean_normalization(X,m,std):
     return ((X-m)/std)
 
 
@@ -126,8 +130,9 @@ def mean_normalization(x,m,std):
 def input(network,n_tfiles,n_vfiles):
     # Xtrain_in,Ytrain_in : list of ndarray
     network.Xtrain_in, network.Ytrain_in, network.train_size = rim.read_Data("ASVspoof2017_V2_train_fbank", "train_info.txt",n_tfiles)  # Read Train data
-    network.mean =  np.mean(network.Xtrain_in)
-    network.std  =  np.std(network.Xtrain_in)
+    stats = read_statistics()
+    network.mean = float(stats[0])
+    network.std = float(stats[1])
     # Normalize input train set data
     # network.Xtrain_in = normalize(network.Xtrain_in)
     network.Xtrain_in = mean_normalization(network.Xtrain_in,network.mean,network.std)
@@ -140,10 +145,15 @@ def input(network,n_tfiles,n_vfiles):
 # read eval dataset
 def eval_input(network,n_efiles):
     network.Xeval_in, network.Yeval_in, network.eval_size = rim.read_pred_data('ASVspoof2017_V2_train_eval','eval_info.txt')
+    # print('$$\n')
+    # print(network.Xeval_in)
     #rim.read_Data('ASVspoof2017_V2_train_eval','eval_info.txt',n_efiles)
+    stats = read_statistics()
+    network.mean = float(stats[0])
+    network.std = float(stats[1])
     # Normalize
-    network.Xeval_in = normalize(network.Xeval_in)
-
+    # network.Xeval_in = normalize(network.Xeval_in)
+    network.Xeval_in = mean_normalization(network.Xeval_in,network.mean,network.std)
 # shuffle index so to get with random order the data
 def shuffling( X,Y):
     indx=np.arange(len(X))          # create a array with indexes for X data
