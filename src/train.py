@@ -59,7 +59,7 @@ try:
         # loop until all data are read
 
             mf.input(network,n_tfiles,n_vfiles) # read input data
-            if(iter>0):
+            if(iter>1):
             #     # initialize train variables
             #     init_op = tf.group(tf.global_variables_initializer())
             #     sess.run(init_op)
