@@ -355,7 +355,7 @@ class CNN(object):
     #take classification decision
     def make_decision(self,y):
         sum_per_col = np.sum(y,axis=0)
-        # print(sum_per_col)
+        print(sum_per_col)
         if(np.greater_equal(sum_per_col[0],sum_per_col[1])): # if true, then spoof label
             self.class_list.append(0)
             self.spoof_counter+=1    #
@@ -366,6 +366,7 @@ class CNN(object):
 
     # compare prediction with true label,count sets
     def calc_f1_sets(self):
+        # actual label of data
         if(np.array_equal(self.Yeval_in[0,:],[0.,.1])): #label is genuine
             l=1
         else: #label is spoof
@@ -393,6 +394,7 @@ class CNN(object):
         accuracy,summ,y_pred=sess.run([self.accuracy_eval,self.merged,self.y_pred_logsoft], feed_dict={self.X_eval: self.Xeval_in, self.Y_eval: self.Yeval_in,self.keep_prob:1.0})
         print('BAKA')
         # print(y_pred)
+        # print('\n')
         # print(y_pred.shape)
         # print(type(y_pred))
         self.make_decision(y_pred)
