@@ -15,4 +15,5 @@ import read_img as rim
 #print(cl_types)
 
 #check read data
-Xdata,Υdata,nframes=rim.read_Data("ASVspoof2017_V2_train_fbank","train_info.txt",700)
+Xdata,Υdata,nframes=rim.read_Data("ASVspoof2017_V2_train_fbank","train_info.txt",80)
+print(nframes)
