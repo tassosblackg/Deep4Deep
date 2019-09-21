@@ -136,18 +136,29 @@ class CNN(object):
             with tf.variable_scope("batch_norm_layer10",reuse= tf.AUTO_REUSE):
                 conv_l10 = mf.batch_n(conv_l10,'batch_norm_l10',True)
             with tf.variable_scope("max-poooling_layer5",reuse= tf.AUTO_REUSE):
-                max_pool_5 = mf.max_pool(conv_l10,2,2,'max_pool_5')
+                # pool_5 = mf.max_pool(conv_l10,2,2,'max_pool_5')
+                pool_5 = mf.avg_pool(conv_l10,2,2,'avg_pool_l5')
 
-            #           --{FULLY CONNECTED LAYERS}--
+            #       --FLAT -OUT --> dimensionality reduction 4D->2D
             with tf.variable_scope("flatt-out_layer3",reuse= tf.AUTO_REUSE):
-                flatt_out = mf.flatten_l(max_pool_5,'flatten_out_layer')
+                flatt_out = mf.flatten_l(pool_5,'flatten_out_layer')
+
+            #            --{FULLY CONNECTED LAYERS}--
             with tf.variable_scope("fully_connected_layer1",reuse= tf.AUTO_REUSE):
                 fc1 = mf.fully_con(flatt_out,256,'fc1',True)
                 fc1 = tf.nn.dropout(fc1,keep_prob)
             with tf.variable_scope("fully_connected_layer2",reuse= tf.AUTO_REUSE):
                 fc2 = mf.fully_con(fc1,512,'fc2',True)
+                fc2 = tf.nn.dropout(fc2,keep_prob)
+            with tf.variable_scope("fully_connected_layer3",reuse= tf.AUTO_REUSE):
+                fc3 = mf.fully_con(fc2,1024,'fc3',True)
+
+            with tf.variable_scope("fully_connected_layer4",reuse= tf.AUTO_REUSE):
+                fc4 = mf.fully_con(fc3,512,'fc4',True)
+
+            #           --| OUTPUT |--
             with tf.variable_scope("Logits-Layer-end",reuse= tf.AUTO_REUSE):
-                logits = mf.dense_layer(fc2,self.n_classes,'Last_layer',True)    # last layer not activation function is used for trainning only
+                logits = mf.dense_layer(fc4,self.n_classes,'Last_layer',True)    # last layer not activation function is used for trainning only
             # logits = mf.outp_layer(fc1,self.n_classes,'Last_layer')
             print('Logits_shape='+str(logits.shape))
             # self.summary_op_train = tf.summary.merge_all()
@@ -371,7 +382,7 @@ class CNN(object):
             l=1
         else: #label is spoof
             l=0
-        if(self.class_list[-1]==l): #compare last element
+        if(self.class_list.pop()==l): #compare last element
             if(l==0):
                 self.true_neg+=1
             else:
