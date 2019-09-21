@@ -184,31 +184,11 @@ def read_stage1(dir_name, class_types,n_files):
 # @labels : is a list with numpy array one-hot encoded labels []
 # @total_nframes : is the total number of frames accross all read .cmp files together
 def read_stage2(data,labels,total_nframes):
+    Y = np.asarray(labels,dtype=np.int32)
+    all_X=np.concatenate(data,axis=0)
 
-    dim=data[0].shape[1]    # 64
-    width=data[0].shape[2]  # 17
-    # create all_params np array
-    all_imgs=np.zeros((total_nframes,dim,width,1),dtype=np.float32)         # initialize np array -- all frames of a .cmp file
-    all_labels=np.zeros(shape=(total_nframes, 2),dtype=np.int32)           # each .cmp file many frames repeat label for number of frames
-    indx=0
-    #revert python lists to numpy array
-    for l in range(len(data)):
-        cframes = data[l].shape[0]  # number of frames per file
-        # print(cframes)
-        all_imgs[indx:indx+cframes,:,:,] = data[l]                      # list to np array
-        all_labels[indx:indx+cframes,:] = labels[l:l+cframes]
-        indx +=cframes
+    return all_X,Y,(len(Y))
 
-    # free space
-    del(data)
-    del(labels)
-    print('End read_stage 2\n')
-
-    # save to file --run only once
-    # np.save("Xdata",all_imgs)
-    # np.save("Ydata",all_labels)
-    return all_imgs,all_labels,total_nframes
-    # return 10,100
 
 # Read totally-- all files and labels
 # @dir_name : directory name where .cmp files are saved
@@ -218,6 +198,7 @@ def read_Data(dir_name, info_file,n_files):
     class_types= read_subset_labels(info_file,n_files)              # read encoded-labels from a file 1st step
     ohe_l = one_hot_encode(class_types)                             # one -hot encode labels -2d step
     data,labels_l,tframes = read_stage1(dir_name,ohe_l,n_files)       # keep a subset of data in memory-3nd step
+    #print(labels_l)
     np_data,np_labels,total_frames = read_stage2(data,labels_l,tframes)
     print("SHAPE= ")
     print(np_data.shape)
