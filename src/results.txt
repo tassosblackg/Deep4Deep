@@ -17,3 +17,43 @@
  | [true_pos= 0,true_neg= 11900, false_pos= 0, false_neg= 0]// >( 0,11900 )<
  | [true_pos= 0,true_neg= 12600, false_pos= 0, false_neg= 0]// >( 0,12600 )<
  | [true_pos= 0,true_neg= 13300, false_pos= 0, false_neg= 0]// >( 0,13300 )<
+//After mean/std normalization
+ | [true_pos= 0,true_neg= 0, false_pos= 700, false_neg= 0]// >( 700,0 )<
+ | [true_pos= 0,true_neg= 0, false_pos= 1400, false_neg= 0]// >( 1400,0 )<
+ | [true_pos= 0,true_neg= 0, false_pos= 2100, false_neg= 0]// >( 2100,0 )<
+ | [true_pos= 0,true_neg= 0, false_pos= 2800, false_neg= 0]// >( 2800,0 )<
+ | [true_pos= 0,true_neg= 0, false_pos= 3500, false_neg= 0]// >( 3500,0 )<
+ | [true_pos= 0,true_neg= 0, false_pos= 4200, false_neg= 0]// >( 4200,0 )<
+ | [true_pos= 0,true_neg= 0, false_pos= 4900, false_neg= 0]// >( 4900,0 )<
+ | [true_pos= 0,true_neg= 0, false_pos= 5600, false_neg= 0]// >( 5600,0 )<
+ | [true_pos= 0,true_neg= 0, false_pos= 6300, false_neg= 0]// >( 6300,0 )<
+ | [true_pos= 0,true_neg= 0, false_pos= 7000, false_neg= 0]// >( 7000,0 )<
+ | [true_pos= 0,true_neg= 0, false_pos= 7700, false_neg= 0]// >( 7700,0 )<
+ | [true_pos= 0,true_neg= 0, false_pos= 8400, false_neg= 0]// >( 8400,0 )<
+ | [true_pos= 0,true_neg= 0, false_pos= 9100, false_neg= 0]// >( 9100,0 )<
+ | [true_pos= 0,true_neg= 0, false_pos= 9800, false_neg= 0]// >( 9800,0 )<
+ | [true_pos= 0,true_neg= 0, false_pos= 10500, false_neg= 0]// >( 10500,0 )<
+ | [true_pos= 0,true_neg= 0, false_pos= 11200, false_neg= 0]// >( 11200,0 )<
+ | [true_pos= 0,true_neg= 0, false_pos= 11900, false_neg= 0]// >( 11900,0 )<
+ | [true_pos= 0,true_neg= 0, false_pos= 12600, false_neg= 0]// >( 12600,0 )<
+ | [true_pos= 0,true_neg= 0, false_pos= 13300, false_neg= 0]// >( 13300,0 )<
+ //AFTER MEAN/STD NORM --FIXED
+ | [true_pos= 0,true_neg= 700, false_pos= 0, false_neg= 0]// >( 0,700 )<
+ | [true_pos= 0,true_neg= 1400, false_pos= 0, false_neg= 0]// >( 0,1400 )<
+ | [true_pos= 0,true_neg= 2100, false_pos= 0, false_neg= 0]// >( 0,2100 )<
+ | [true_pos= 0,true_neg= 2800, false_pos= 0, false_neg= 0]// >( 0,2800 )<
+ | [true_pos= 0,true_neg= 3500, false_pos= 0, false_neg= 0]// >( 0,3500 )<
+ | [true_pos= 0,true_neg= 4200, false_pos= 0, false_neg= 0]// >( 0,4200 )<
+ | [true_pos= 0,true_neg= 4900, false_pos= 0, false_neg= 0]// >( 0,4900 )<
+ | [true_pos= 0,true_neg= 5600, false_pos= 0, false_neg= 0]// >( 0,5600 )<
+ | [true_pos= 0,true_neg= 6300, false_pos= 0, false_neg= 0]// >( 0,6300 )<
+ | [true_pos= 0,true_neg= 7000, false_pos= 0, false_neg= 0]// >( 0,7000 )<
+ | [true_pos= 0,true_neg= 7700, false_pos= 0, false_neg= 0]// >( 0,7700 )<
+ | [true_pos= 0,true_neg= 8400, false_pos= 0, false_neg= 0]// >( 0,8400 )<
+ | [true_pos= 0,true_neg= 9100, false_pos= 0, false_neg= 0]// >( 0,9100 )<
+ | [true_pos= 0,true_neg= 9800, false_pos= 0, false_neg= 0]// >( 0,9800 )<
+ | [true_pos= 0,true_neg= 10500, false_pos= 0, false_neg= 0]// >( 0,10500 )<
+ | [true_pos= 0,true_neg= 11200, false_pos= 0, false_neg= 0]// >( 0,11200 )<
+ | [true_pos= 0,true_neg= 11900, false_pos= 0, false_neg= 0]// >( 0,11900 )<
+ | [true_pos= 0,true_neg= 12600, false_pos= 0, false_neg= 0]// >( 0,12600 )<
+ | [true_pos= 0,true_neg= 13300, false_pos= 0, false_neg= 0]// >( 0,13300 )<
