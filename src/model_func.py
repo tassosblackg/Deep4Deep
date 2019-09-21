@@ -53,10 +53,12 @@ def batch_n(convl,name,summary=False):
         summ_list.append(bn_act_summ)
     return(act)
 
-# define max pooling function
+# define max pooling function 2x2
 def max_pool(x, strides, k,name):
     return (tf.nn.max_pool(x, strides=[1, 2, strides, 1], ksize=[1, 2, k, 1], padding='VALID',name=name))
-
+# define average pooling function 2x2
+def avg_pool(x,strides,k,name):
+    return(tf.nn.avg_pool(x, strides=[1, 2, strides, 1], ksize=[1, 2, k, 1], padding='VALID',name=name))
 
 #flatten layer
 def flatten_l(inp,name):
