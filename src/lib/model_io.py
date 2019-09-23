@@ -39,7 +39,7 @@ def get_model_id():
     return model_id
 
 def save_variables(sess, saver, epoch, model_id):
-    model_path = '../Variables8'# Define it
+    model_path = '../Variables1'# Define it
     if not os.path.exists(model_path):
         os.makedirs(model_path)
     checkpoint_path = os.path.join(model_path, 'cnn')
@@ -51,11 +51,12 @@ def restore_variables(sess):
     # print("VAR=")
     # print(variables_to_restore)
     # for var in tf.trainable_variables():
-    #     print(var)
-    #     print('\n')
+        # with open('out.txt', 'w') as f:
+      #  print(var)
+      #  print('\n')
     saver = tf.train.Saver(variables_to_restore)
 
-    model_path ='../Variables8' # Define it
+    model_path ='../Variables1' # Define it
     #saver = tf.train.import_meta_graph(model_path+'/cnn-30.meta')
     print(model_path)
     ckpt = tf.train.get_checkpoint_state(model_path)
