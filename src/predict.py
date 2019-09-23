@@ -82,6 +82,7 @@ except Exception :
     flag=1
 
 
-# if(flag==1):
-#     file1 = os.path.basename(path_to_eval_set)+"_status.txt"
-#     if(os.path.exists(file1)): os.remove(file1) # delete file read status when an error occurs so to restart
+if(flag==1):
+    file1 = os.path.basename(path_to_eval_set)+"_status.txt"
+    if(os.path.exists(file1)): os.remove(file1) # delete file read status when an error occurs so to restart
+    if(os.path.exists('eval_info_labels_status.txt')): os.remove('eval_info_labels_status.txt')
