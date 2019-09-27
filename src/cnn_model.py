@@ -74,7 +74,7 @@ class CNN(object):
                 conv_l2 = mf.batch_n(conv_l2,'batch_norm_l2',True)
 
             with tf.variable_scope("max-pooling_layer1",reuse= tf.AUTO_REUSE):
-                max_pool_1 = mf.max_pool(conv_l2,2,1,'max_pool_bl2')
+                max_pool_1 = mf.max_pool(conv_l2,1,1,'max_pool_bl2')
 
             #               --{2nd BLOCK}--
             # 3d layer
@@ -90,7 +90,7 @@ class CNN(object):
             with tf.variable_scope("batch_norm_layer4",reuse= tf.AUTO_REUSE):
                 conv_l4 = mf.batch_n(conv_l4,'batch_norm_l4',True)
             with tf.variable_scope("max-pooling_layer2",reuse= tf.AUTO_REUSE):
-                max_pool_2 = mf.max_pool(conv_l4,2,1,'max_pool_bl2')
+                max_pool_2 = mf.max_pool(conv_l4,1,1,'max_pool_bl2')
 
             #               --{3d BLOCK}--
             # 5th layer
@@ -136,7 +136,7 @@ class CNN(object):
             with tf.variable_scope("batch_norm_layer10",reuse= tf.AUTO_REUSE):
                 conv_l10 = mf.batch_n(conv_l10,'batch_norm_l10',True)
             with tf.variable_scope("max-poooling_layer5",reuse= tf.AUTO_REUSE):
-                pool_5 = mf.max_pool(conv_l10,2,1,'max_pool_5')
+                pool_5 = mf.max_pool(conv_l10,2,2,'max_pool_5') # strides,k
                 # pool_5 = mf.avg_pool(conv_l10,2,2,'avg_pool_l5')
 
             #       --FLAT -OUT --> dimensionality reduction 4D->2D
@@ -145,7 +145,7 @@ class CNN(object):
 
             #            --{FULLY CONNECTED LAYERS}--
             with tf.variable_scope("fully_connected_layer1",reuse= tf.AUTO_REUSE):
-                fc1 = mf.fully_con(flatt_out,256,'fc1',True)
+                fc1 = mf.fully_con(flatt_out,1024,'fc1',True)
                 fc1 = tf.nn.dropout(fc1,keep_prob)
             with tf.variable_scope("fully_connected_layer2",reuse= tf.AUTO_REUSE):
                 fc2 = mf.fully_con(fc1,512,'fc2',True)
@@ -291,7 +291,7 @@ class CNN(object):
         start_time = time.clock()
 
         n_early_stop_epochs = 5 # Define it
-        n_epochs = 20  # Define it
+        n_epochs = 35  # Define it
 
         early_stop_counter = 0
 
@@ -309,7 +309,7 @@ class CNN(object):
             # print("valid ends")
             epoch_end_time=time.clock()
             # if (epoch % 10 == 0):
-            info_str ='Epoch='+str(epoch) + ', Train:{:.10f} '  .format(train_loss) + ', Valid:{:.3f} '.format(valid_loss) + ', Time=' +str(epoch_end_time - epoch_start_time)
+            info_str ='Epoch='+str(epoch) + ', Train:{:.10f} '  .format(train_loss) + ', Valid:{:.10f} '.format(valid_loss) + ', Time=' +str(epoch_end_time - epoch_start_time)
             print(info_str)
 
             if valid_loss < min_valid_loss:
